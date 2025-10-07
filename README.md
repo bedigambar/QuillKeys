@@ -84,13 +84,11 @@ npm run build
 
 ## 🛠️ Tech Stack
 
-- **React 18** - UI Library
-- **TypeScript** - Type Safety
-- **Vite** - Build Tool & Dev Server
-- **Tailwind CSS** - Styling
-- **Zustand** - State Management
-- **Lucide React** - Icons
-- **React Router** - Navigation
+- **React 18**
+- **TypeScript**
+- **Tailwind CSS**
+- **Zustand** 
+- **React Router**
 
 ## 🎯 How It Works
 
@@ -129,7 +127,7 @@ To add new literary passages, edit `src/data/questions.ts`:
 
 ## 📝 License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is open source and available under the [MIT License](https://github.com/bedigambar/QuillKeys/blob/main/LICENSE).
 
 ## 🌟 Acknowledgments
 
