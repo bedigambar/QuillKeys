@@ -119,9 +119,9 @@ To add new literary passages, edit `src/data/questions.ts`:
 
 ```typescript
 {
-  text: "Your literary passage here...",
-  author: "Author Name",
-  work: "Work Title"
+   id:"",
+   category:"",
+   text: ""
 }
 ```
 
