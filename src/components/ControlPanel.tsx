@@ -10,7 +10,7 @@ import { getRandomQuestion } from '@/data/questions';
 import { useState } from 'react';
 
 const ControlPanel = () => {
-    const { timerDuration, setTimerDuration, category, startTest, setCategory, status, resetTest,
+    const { timerDuration, setTimerDuration, category, startCountdown, setCategory, status, resetTest,
         setCurrentText, customTimerDuration, setCustomTimerDuration
     } = useTypingStore();
 
@@ -39,7 +39,7 @@ const ControlPanel = () => {
         const question = getRandomQuestion(category);
         setCurrentText(question.text);
 
-        startTest();
+        startCountdown();
     }
     return (
         <div className='space-y-4'>
@@ -57,7 +57,7 @@ const ControlPanel = () => {
                     }}
                     className='w-auto'
                 >
-                    <TabsList className={`bg-gray-200/80 dark:bg-gray-800/80 rounded-full w-fit ${status === 'running' ? 'pointer-events-none opacity-50' : ''}`}>
+                    <TabsList className={`bg-gray-200/80 dark:bg-gray-800/80 rounded-full w-fit ${status === 'running' || status === 'countdown' ? 'pointer-events-none opacity-50' : ''}`}>
                         {timerOptions.map((time) => (
                             <TabsTrigger key={time} value={time.toString()}>
                                 {formatTime(time)}
@@ -77,7 +77,7 @@ const ControlPanel = () => {
                                 max="600"
                                 value={customInput}
                                 onChange={handleCustomInputChange}
-                                disabled={status === 'running'}
+                                disabled={status === 'running' || status === 'countdown'}
                                 placeholder="120"
                                 className="w-20 px-3 py-1.5 text-center border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                             />
@@ -95,7 +95,7 @@ const ControlPanel = () => {
                     <Select
                         value={category}
                         onValueChange={setCategory}
-                        disabled={status === 'running'}
+                        disabled={status === 'running' || status === 'countdown'}
                     >
                         <SelectTrigger className="w-[140px]">
                             <SelectValue />
@@ -119,7 +119,7 @@ const ControlPanel = () => {
                         </Button>
                     )}
 
-                    {(status == 'running' || status == 'completed') && (
+                    {(status == 'running' || status == 'completed' || status == 'countdown') && (
                         <Button onClick={resetTest} variant="outline" className="flex items-center justify-center gap-2 min-w-[120px] sm:min-w-0 px-6 sm:px-4">
                             <RotateCcw className="h-4 w-4" />
                             Reset

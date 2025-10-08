@@ -4,7 +4,7 @@ import { useTypingStore } from '@/store/typing-store';
 
 const TypingArea = () => {
 
-    const { currentText, typedText, setTypedText, status } = useTypingStore();
+    const { currentText, typedText, setTypedText, status, countdownTime } = useTypingStore();
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -83,6 +83,27 @@ const TypingArea = () => {
                     <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-lg">
                         <p className="text-muted-foreground">Click "Start Test" to begin</p>
                     </div>
+                )
+            }
+
+            {
+                status === 'countdown' && (
+                    <motion.div 
+                        className="absolute inset-0 flex items-center justify-center bg-background/90 backdrop-blur-sm rounded-lg"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                    >
+                        <motion.div
+                            key={countdownTime}
+                            initial={{ scale: 0.5, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 1.5, opacity: 0 }}
+                            transition={{ duration: 0.5 }}
+                            className="text-8xl font-bold text-primary"
+                        >
+                            {countdownTime}
+                        </motion.div>
+                    </motion.div>
                 )
             }
         </motion.div>

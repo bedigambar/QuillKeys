@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type TestStatus = 'idle' | 'running' | 'completed';
+export type TestStatus = 'idle' | 'countdown' | 'running' | 'completed';
 export type TimerOption = 30 | 60 | 180 | 'custom';
 
 export interface TestResult {
@@ -26,6 +26,7 @@ interface TypingState {
   // Test state
   status: TestStatus;
   timeLeft: number;
+  countdownTime: number;
   currentText: string;
   typedText: string;
   
@@ -45,6 +46,8 @@ interface TypingState {
   setCategory: (category: string) => void;
   setCurrentText: (text: string) => void;
   setTypedText: (text: string) => void;
+  startCountdown: () => void;
+  updateCountdown: () => void;
   startTest: () => void;
   updateTimer: () => void;
   completeTest: () => void;
@@ -63,6 +66,7 @@ export const useTypingStore = create<TypingState>()(
       category: 'JavaScript',
       status: 'idle',
       timeLeft: 60,
+      countdownTime: 3,
       currentText: '',
       typedText: '',
       wpm: 0,
@@ -103,16 +107,32 @@ export const useTypingStore = create<TypingState>()(
         }
       },
       
+      startCountdown: () => {
+        set({ 
+          status: 'countdown', 
+          countdownTime: 3,
+          typedText: '',
+          wpmHistory: [],
+          totalCorrectChars: 0,
+          totalTypedChars: 0
+        });
+      },
+
+      updateCountdown: () => {
+        const { countdownTime } = get();
+        if (countdownTime > 1) {
+          set({ countdownTime: countdownTime - 1 });
+        } else {
+          get().startTest();
+        }
+      },
+
       startTest: () => {
         const { timerDuration, customTimerDuration } = get();
         const actualDuration = timerDuration === 'custom' ? customTimerDuration : timerDuration;
         set({ 
           status: 'running', 
-          timeLeft: actualDuration,
-          typedText: '',
-          wpmHistory: [],
-          totalCorrectChars: 0,
-          totalTypedChars: 0
+          timeLeft: actualDuration
         });
       },
       

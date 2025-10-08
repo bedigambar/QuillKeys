@@ -8,12 +8,16 @@ import { useEffect } from 'react';
 import { StatsDisplay } from './Stats';
 
 const TypingTest = () => {
-  const { status, updateTimer, addWpmDataPoint } = useTypingStore();
+  const { status, updateTimer, updateCountdown, addWpmDataPoint } = useTypingStore();
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
-    if (status === 'running') {
+    if (status === 'countdown') {
+      interval = setInterval(() => {
+        updateCountdown();
+      }, 1000);
+    } else if (status === 'running') {
       interval = setInterval(() => {
         updateTimer();
         const currentWpm = useTypingStore.getState().wpm;
@@ -28,7 +32,7 @@ const TypingTest = () => {
         clearInterval(interval);
       }
     };
-  }, [status, updateTimer, addWpmDataPoint]);
+  }, [status, updateTimer, updateCountdown, addWpmDataPoint]);
   return (
     <div className='max-w-4xl mx-auto space-y-4 sm:space-y-6 px-2 sm:px-4'>
 
