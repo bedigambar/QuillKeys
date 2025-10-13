@@ -1,10 +1,27 @@
 import Header from '@/components/Header'
 import TypingTest from '@/components/TypingTest'
+import KeyboardShortcuts from '@/components/KeyboardShortcuts'
+import ShortcutNotifications from '@/components/ShortcutNotifications'
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
+import { useShortcutNotifications } from '@/hooks/useShortcutNotifications'
 import { motion } from 'framer-motion'
 
 const Typing = () => {
+  // Initialized notifications
+  const { notifications, removeNotification, notifyRestart, notifyStart } = useShortcutNotifications();
+  
+  // Initialized keyboard shortcuts
+  useKeyboardShortcuts({
+    onRestartTest: () => {
+      notifyRestart();
+    },
+    onStartTest: () => {
+      notifyStart();
+    }
+  });
+
   return (
-    <div className='min-h-screen'>
+    <div className='min-h-screen pb-24 md:pb-28 lg:pb-20'>
       <Header />
 
       <main className='container mx-auto px-4 py-4 sm:py-8'>
@@ -58,6 +75,12 @@ const Typing = () => {
           </div>
         </div>
       </main>
+
+      <KeyboardShortcuts />
+      <ShortcutNotifications 
+        notifications={notifications} 
+        onRemove={removeNotification} 
+      />
     </div>
   )
 }
