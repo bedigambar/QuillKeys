@@ -7,10 +7,10 @@ import { useShortcutNotifications } from '@/hooks/useShortcutNotifications'
 import { motion } from 'framer-motion'
 
 const Typing = () => {
-  // Initialized notifications
+  
   const { notifications, removeNotification, notifyRestart, notifyStart } = useShortcutNotifications();
   
-  // Initialized keyboard shortcuts
+  
   useKeyboardShortcuts({
     onRestartTest: () => {
       notifyRestart();

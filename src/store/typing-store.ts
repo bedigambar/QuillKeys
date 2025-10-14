@@ -18,29 +18,29 @@ export interface WpmDataPoint {
 }
 
 interface TypingState {
-  // Test configuration
+  
   timerDuration: TimerOption;
   customTimerDuration: number;
   category: string;
   
-  // Test state
+  
   status: TestStatus;
   timeLeft: number;
   countdownTime: number;
   currentText: string;
   typedText: string;
   
-  // Statistics
+  
   wpm: number;
   accuracy: number;
   wpmHistory: WpmDataPoint[];
   testResults: TestResult[];
   
-  // Cumulative stats for continuous typing
+  
   totalCorrectChars: number;
   totalTypedChars: number;
   
-  // Actions
+  
   setTimerDuration: (duration: TimerOption) => void;
   setCustomTimerDuration: (duration: number) => void;
   setCategory: (category: string) => void;
@@ -60,7 +60,7 @@ interface TypingState {
 export const useTypingStore = create<TypingState>()(
   persist(
     (set, get) => ({
-      // Initial state
+      
       timerDuration: 60,
       customTimerDuration: 120,
       category: 'JavaScript',
@@ -76,7 +76,7 @@ export const useTypingStore = create<TypingState>()(
       totalCorrectChars: 0,
       totalTypedChars: 0,
 
-      // Actions
+      
       setTimerDuration: (duration) => {
         const { customTimerDuration } = get();
         const actualDuration = duration === 'custom' ? customTimerDuration : duration;
@@ -100,9 +100,9 @@ export const useTypingStore = create<TypingState>()(
         set({ typedText: text });
         get().calculateStats();
         
-        // Check if user has typed enough to reach the end of current text
+        
         if (status === 'running' && text.length >= currentText.length) {
-          // Load a new question immediately
+          
           get().loadNewQuestion();
         }
       },
@@ -186,7 +186,7 @@ export const useTypingStore = create<TypingState>()(
         const { typedText, currentText, timerDuration, customTimerDuration, timeLeft, totalCorrectChars, totalTypedChars } = get();
         const actualDuration = timerDuration === 'custom' ? customTimerDuration : timerDuration;
         
-        // Calculate current paragraph stats
+        
         let currentCorrectChars = 0;
         for (let i = 0; i < typedText.length; i++) {
           if (i < currentText.length && typedText[i] === currentText[i]) {
@@ -194,24 +194,24 @@ export const useTypingStore = create<TypingState>()(
           }
         }
         
-        // Use cumulative stats for accuracy
+        
         const cumulativeTypedChars = totalTypedChars + typedText.length;
         const cumulativeCorrectChars = totalCorrectChars + currentCorrectChars;
         const accuracy = cumulativeTypedChars > 0 ? Math.round((cumulativeCorrectChars / cumulativeTypedChars) * 100) : 100;
         
-        // Calculate WPM based on cumulative CORRECT characters
-        const timeElapsedSeconds = actualDuration - timeLeft;
-        const timeElapsedMinutes = timeElapsedSeconds / 60; // in minutes
         
-        // Prevent inflated WPM at the start - require minimum 2 seconds elapsed
+        const timeElapsedSeconds = actualDuration - timeLeft;
+  const timeElapsedMinutes = timeElapsedSeconds / 60;
+        
+        
         const minTimeSeconds = 2;
         let wpm = 0;
         
         if (timeElapsedSeconds >= minTimeSeconds && cumulativeTypedChars > 0) {
-          const correctWords = cumulativeCorrectChars / 5; // Standard WPM: every 5 correct chars = 1 word
+          const correctWords = cumulativeCorrectChars / 5;
           wpm = Math.round(correctWords / timeElapsedMinutes);
         } else {
-          // Show 0 WPM until minimum time has elapsed
+          
           wpm = 0;
         }
         
@@ -230,7 +230,7 @@ export const useTypingStore = create<TypingState>()(
       loadNewQuestion: () => {
         const { category, status, typedText, currentText, totalCorrectChars, totalTypedChars } = get();
         if (status === 'running') {
-          // Calculate and add current paragraph stats to cumulative totals
+          
           let currentCorrectChars = 0;
           for (let i = 0; i < typedText.length; i++) {
             if (i < currentText.length && typedText[i] === currentText[i]) {
@@ -238,7 +238,7 @@ export const useTypingStore = create<TypingState>()(
             }
           }
           
-          // Import here to avoid circular dependency
+          
           import('@/data/questions').then(({ getRandomQuestion }) => {
             const newQuestion = getRandomQuestion(category);
             set({ 
