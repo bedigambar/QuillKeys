@@ -82,15 +82,25 @@ const ResultCard = () => {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
     >
-      <Card className="w-full max-w-2xl mx-auto">
+      <Card className="w-full max-w-2xl mx-auto relative">
+        <span
+          className="absolute left-3 top-3 z-10 select-none font-extrabold text-primary text-base sm:text-lg md:text-xl lg:text-2xl tracking-tight px-2 py-1 rounded bg-white/80 dark:bg-neutral-900/80 shadow-sm"
+          style={{ pointerEvents: 'none' }}
+        >
+          QuillKeys
+        </span>
         <CardHeader>
-          <CardTitle className="text-center text-xl sm:text-2xl font-bold">Test Results</CardTitle>
+          <CardTitle
+            className="text-center text-xl sm:text-2xl font-bold mt-8 xs:mt-10"
+            style={{ marginTop: '2.5rem' }} 
+          >
+            Test Results
+          </CardTitle>
           <div className="text-center text-sm sm:text-base text-muted-foreground mt-1">
             Author: <span className="font-semibold text-primary">{category}</span>
           </div>
         </CardHeader>
         <CardContent className="space-y-4 sm:space-y-6">
-          {/* Main stats */}
           <div className="grid grid-cols-3 gap-2 sm:gap-4">
             {stats.map((stat, index) => {
               const IconComponent = stat.icon;
@@ -114,7 +124,6 @@ const ResultCard = () => {
             })}
           </div>
 
-          {/* Additional stats: Peak WPM, Average WPM, Consistency */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
