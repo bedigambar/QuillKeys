@@ -6,7 +6,7 @@ import { Trophy, Target, Clock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const ResultCard = () => {
-  const { wpm, accuracy, timerDuration, timeLeft, wpmHistory } = useTypingStore();
+  const { wpm, accuracy, timerDuration, timeLeft, wpmHistory, category } = useTypingStore();
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
@@ -85,6 +85,9 @@ const ResultCard = () => {
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle className="text-center text-xl sm:text-2xl font-bold">Test Results</CardTitle>
+          <div className="text-center text-sm sm:text-base text-muted-foreground mt-1">
+            Author: <span className="font-semibold text-primary">{category}</span>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4 sm:space-y-6">
           {/* Main stats */}
