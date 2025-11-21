@@ -5,13 +5,14 @@ import { TabsList } from '@radix-ui/react-tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Button } from './ui/button';
 
-import { Play, RotateCcw, Clock } from 'lucide-react';
+import { Play, RotateCcw, Clock, Type, MousePointer2, EyeOff } from 'lucide-react';
 import { getRandomQuestion } from '@/data/questions';
 import { useState } from 'react';
 
 const ControlPanel = () => {
     const { timerDuration, setTimerDuration, category, startCountdown, setCategory, status, resetTest,
-        setCurrentText, customTimerDuration, setCustomTimerDuration
+        setCurrentText, customTimerDuration, setCustomTimerDuration,
+        fontTheme, setFontTheme, caretStyle, setCaretStyle, zenMode, toggleZenMode
     } = useTypingStore();
 
     const [customInput, setCustomInput] = useState(customTimerDuration.toString());
@@ -43,8 +44,7 @@ const ControlPanel = () => {
     }
     return (
         <div className='space-y-4'>
-            {/* Timer section - centered */}
-            <div className='flex flex-col items-center'>
+            <div className="flex flex-col items-center gap-2 sm:gap-3">
                 <div className='text-sm font-medium mb-1'>Timer</div>
                 <Tabs
                     value={timerDuration.toString()}
@@ -88,7 +88,6 @@ const ControlPanel = () => {
                 )}
             </div>
 
-            {/* Category and Button row */}
             <div className='flex items-end justify-between gap-4'>
                 <div className='flex flex-col gap-2'>
                     <div className="text-sm font-medium pl-1">Category</div>
@@ -127,7 +126,48 @@ const ControlPanel = () => {
                     )}
                 </div>
             </div>
-        </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-center pt-4 border-t border-gray-200 dark:border-gray-800">
+                <div className="flex gap-1 sm:gap-2 items-center">
+                    <Type className="w-4 h-4 text-gray-500" />
+                    <Select value={fontTheme} onValueChange={(v) => setFontTheme(v as any)}>
+                        <SelectTrigger className="w-[100px] h-8 text-xs">
+                            <SelectValue placeholder="Font" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="serif">Serif</SelectItem>
+                            <SelectItem value="sans">Sans</SelectItem>
+                            <SelectItem value="mono">Mono</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="flex gap-1 sm:gap-2 items-center">
+                    <MousePointer2 className="w-4 h-4 text-gray-500" />
+                    <Select value={caretStyle} onValueChange={(v) => setCaretStyle(v as any)}>
+                        <SelectTrigger className="w-[100px] h-8 text-xs">
+                            <SelectValue placeholder="Caret" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="line">Line</SelectItem>
+                            <SelectItem value="block">Block</SelectItem>
+                            <SelectItem value="underline">Underline</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Zen Mode */}
+                <Button
+                    variant={zenMode ? "secondary" : "ghost"}
+                    size="sm"
+                    onClick={toggleZenMode}
+                    className="h-8 text-xs gap-2"
+                >
+                    <EyeOff className="w-3 h-3" />
+                    Zen Mode
+                </Button>
+            </div>
+        </div >
     )
 }
 

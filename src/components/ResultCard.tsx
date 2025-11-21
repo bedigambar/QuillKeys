@@ -2,12 +2,46 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTypingStore } from '@/store/typing-store';
-import { Trophy, Target, Clock } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Trophy, Target, Clock, Download, History } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { toPng } from 'html-to-image';
+import { useNavigate } from 'react-router-dom';
 
 const ResultCard = () => {
   const { wpm, accuracy, timerDuration, timeLeft, wpmHistory, category } = useTypingStore();
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  const handleDownloadCertificate = async () => {
+    if (cardRef.current === null) return;
+
+    try {
+      // Create a clone of the card to modify styles for export without affecting the UI
+      const dataUrl = await toPng(cardRef.current, {
+        cacheBust: true,
+        backgroundColor: isDarkMode ? '#09090b' : '#ffffff',
+        pixelRatio: 2, // Higher quality
+        style: {
+          transform: 'scale(1)',
+          margin: '0',
+          width: 'auto', // Let it fit content
+          height: 'auto',
+          maxHeight: 'none',
+          maxWidth: 'none'
+        },
+        filter: () => true
+      });
+
+      const link = document.createElement('a');
+      link.download = `quillkeys-certificate-${Date.now()}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Failed to generate certificate', err);
+    }
+  };
 
   useEffect(() => {
     // Check for dark mode preference
@@ -21,28 +55,39 @@ const ResultCard = () => {
     // Clean up the event listener
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
-  
+
   const actualDuration = typeof timerDuration === 'number' ? timerDuration : 120;
   const timeTaken = actualDuration - timeLeft;
 
-  // Calculate peak WPM, average WPM, and consistency score
+  // Calculate peak WPM and consistency score
   const peakWpm = wpmHistory.length > 0 ? Math.max(...wpmHistory.map(d => d.wpm)) : wpm;
-  const avgWpm = wpmHistory.length > 0 
-    ? Math.round(wpmHistory.reduce((sum, d) => sum + d.wpm, 0) / wpmHistory.length)
-    : wpm;
-  
+
+  // Use the final WPM from store as the average/net WPM
+  const avgWpm = wpm;
+
   // Consistency score: Lower standard deviation = more consistent (higher score)
   const calculateConsistency = () => {
     if (wpmHistory.length < 2) return 100;
-    const mean = avgWpm;
-    const variance = wpmHistory.reduce((sum, d) => sum + Math.pow(d.wpm - mean, 2), 0) / wpmHistory.length;
+
+    // Calculate mean of history for consistency check
+    const historyMean = wpmHistory.reduce((sum, d) => sum + d.wpm, 0) / wpmHistory.length;
+
+    if (historyMean === 0) return 100;
+
+    const variance = wpmHistory.reduce((sum, d) => sum + Math.pow(d.wpm - historyMean, 2), 0) / wpmHistory.length;
     const stdDev = Math.sqrt(variance);
-    // Convert to a 0-100 score (lower stdDev = higher score)
-    // Assuming stdDev of 0 = 100, stdDev of 30+ = 0
-    const consistency = Math.max(0, Math.min(100, 100 - (stdDev * 3.33)));
-    return Math.round(consistency);
+
+    // Coefficient of Variation (CV) = StdDev / Mean
+    // A lower CV means more consistent typing relative to speed
+    const cv = stdDev / historyMean;
+
+    // Convert to score: 100 * (1 - CV)
+    // We'll be a bit lenient and map CV 0-0.5 to 100-50, and anything above 1.0 to 0
+    const consistency = 100 * (1 - cv);
+
+    return Math.round(Math.max(0, Math.min(100, consistency)));
   };
-  
+
   const consistencyScore = calculateConsistency();
 
   const stats = [
@@ -82,7 +127,7 @@ const ResultCard = () => {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
     >
-      <Card className="w-full max-w-2xl mx-auto relative">
+      <Card ref={cardRef} className="w-full max-w-2xl mx-auto relative bg-card text-card-foreground">
         <span
           className="absolute left-3 top-3 z-10 select-none font-extrabold text-primary text-base sm:text-lg md:text-xl lg:text-2xl tracking-tight px-2 py-1 rounded bg-white/80 dark:bg-neutral-900/80 shadow-sm"
           style={{ pointerEvents: 'none' }}
@@ -92,7 +137,7 @@ const ResultCard = () => {
         <CardHeader>
           <CardTitle
             className="text-center text-xl sm:text-2xl font-bold mt-8 xs:mt-10"
-            style={{ marginTop: '2.5rem' }} 
+            style={{ marginTop: '2.5rem' }}
           >
             Test Results
           </CardTitle>
@@ -140,11 +185,10 @@ const ResultCard = () => {
             </div>
             <div className="text-center">
               <div className="text-xs sm:text-sm text-muted-foreground mb-1">Consistency</div>
-              <div className={`text-xl font-bold ${
-                consistencyScore >= 80 ? 'text-green-500' : 
-                consistencyScore >= 60 ? 'text-yellow-500' : 
-                'text-orange-500'
-              }`}>
+              <div className={`text-xl font-bold ${consistencyScore >= 80 ? 'text-green-500' :
+                consistencyScore >= 60 ? 'text-yellow-500' :
+                  'text-orange-500'
+                }`}>
                 {consistencyScore}%
               </div>
             </div>
@@ -162,22 +206,22 @@ const ResultCard = () => {
                   <LineChart data={wpmHistory}>
                     <defs>
                       <linearGradient id="colorWpm" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={chartLineColor} stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor={chartLineColor} stopOpacity={0}/>
+                        <stop offset="5%" stopColor={chartLineColor} stopOpacity={0.3} />
+                        <stop offset="95%" stopColor={chartLineColor} stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
-                    <XAxis 
-                      dataKey="time" 
+                    <XAxis
+                      dataKey="time"
                       stroke={chartAxisColor}
                       label={{ value: 'Time (s)', position: 'insideBottom', offset: -5, fill: chartAxisColor }}
                     />
-                    <YAxis 
+                    <YAxis
                       stroke={chartAxisColor}
                       label={{ value: 'WPM', angle: -90, position: 'insideLeft', fill: chartAxisColor }}
                     />
-                    <Tooltip 
-                      contentStyle={{ 
+                    <Tooltip
+                      contentStyle={{
                         backgroundColor: tooltipBgColor,
                         border: `1px solid ${chartGridColor}`,
                         borderRadius: '8px',
@@ -186,10 +230,10 @@ const ResultCard = () => {
                       labelStyle={{ color: tooltipTextColor }}
                       itemStyle={{ color: tooltipTextColor }}
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="wpm" 
-                      stroke={chartLineColor} 
+                    <Line
+                      type="monotone"
+                      dataKey="wpm"
+                      stroke={chartLineColor}
                       strokeWidth={3}
                       dot={{ fill: chartLineColor, strokeWidth: 2, r: 4 }}
                       fill="url(#colorWpm)"
@@ -203,6 +247,17 @@ const ResultCard = () => {
           )}
         </CardContent>
       </Card>
+
+      <div className="flex justify-center gap-4 mt-6">
+        <Button onClick={handleDownloadCertificate} className="gap-2">
+          <Download className="w-4 h-4" />
+          Download Certificate
+        </Button>
+        <Button onClick={() => navigate('/history')} variant="outline" className="gap-2">
+          <History className="w-4 h-4" />
+          View History
+        </Button>
+      </div>
     </motion.div>
   );
 }

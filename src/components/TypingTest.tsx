@@ -8,7 +8,11 @@ import { useEffect } from 'react';
 import { StatsDisplay } from './Stats';
 
 const TypingTest = () => {
-  const { status, updateTimer, updateCountdown, addWpmDataPoint } = useTypingStore();
+  const { status, updateTimer, updateCountdown, addWpmDataPoint, resetTest } = useTypingStore();
+
+  useEffect(() => {
+    resetTest();
+  }, []);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -20,10 +24,7 @@ const TypingTest = () => {
     } else if (status === 'running') {
       interval = setInterval(() => {
         updateTimer();
-        const currentWpm = useTypingStore.getState().wpm;
-        if (currentWpm > 0) {
-          addWpmDataPoint(currentWpm);
-        }
+        addWpmDataPoint();
       }, 1000);
     }
 

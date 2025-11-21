@@ -4,7 +4,7 @@ import { useTypingStore } from '@/store/typing-store';
 
 const TypingArea = () => {
 
-    const { currentText, typedText, setTypedText, status, countdownTime } = useTypingStore();
+    const { currentText, typedText, setTypedText, status, countdownTime, fontTheme, caretStyle } = useTypingStore();
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -31,7 +31,13 @@ const TypingArea = () => {
                             className = typedChar === char ? 'text-green-600 dark:text-green-400 font-semibold scale-[1.05] transition-transform duration-100'
                                 : 'text-red-600 dark:text-red-400';
                         } else if (isCurrentWord && charIndex === typedWord.length) {
-                            className = 'border-b-2 border-primary animate-pulse';
+                            if (caretStyle === 'block') {
+                                className = 'bg-primary text-primary-foreground animate-pulse';
+                            } else if (caretStyle === 'line') {
+                                className = 'border-l-2 border-primary animate-pulse';
+                            } else {
+                                className = 'border-b-2 border-primary animate-pulse';
+                            }
                         }
 
                         return (
@@ -57,7 +63,9 @@ const TypingArea = () => {
             className="relative"
         >
 
-            <div className='p-3 sm:p-4 md:p-6 min-h-[150px] sm:min-h-[200px]'>
+            <div className={`p-3 sm:p-4 md:p-6 min-h-[150px] sm:min-h-[200px] ${fontTheme === 'serif' ? 'font-serif' :
+                    fontTheme === 'mono' ? 'font-mono' : 'font-sans'
+                }`}>
 
                 <div className='text-base sm:text-lg md:text-xl leading-relaxed'>
                     {renderText()}
@@ -88,7 +96,7 @@ const TypingArea = () => {
 
             {
                 status === 'countdown' && (
-                    <motion.div 
+                    <motion.div
                         className="absolute inset-0 flex items-center justify-center bg-background/90 backdrop-blur-sm rounded-lg"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}

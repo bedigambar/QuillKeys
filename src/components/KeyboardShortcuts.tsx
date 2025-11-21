@@ -105,30 +105,30 @@ const KeyboardShortcuts = () => {
             className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border"
         >
             <div className="container mx-auto px-2 sm:px-4">
-                {/* Desktop Layout */}
+
                 <div className="hidden lg:block py-3">
                     <div className="flex items-center justify-center gap-6 xl:gap-8">
-                        {/* Header */}
+
                         <div className="flex items-center gap-2 text-sm font-medium">
                             <Keyboard className="w-4 h-4" />
                             <span>Keyboard Shortcuts</span>
                         </div>
 
-                        {/* All shortcuts */}
+
                         {shortcuts.map((shortcut, index) => renderShortcut(shortcut, index))}
                     </div>
                 </div>
 
-                {/* Tablet Layout */}
+
                 <div className="hidden md:block lg:hidden py-2.5">
                     <div className="flex flex-col gap-2">
-                        {/* Header */}
+
                         <div className="flex items-center justify-center gap-2 text-sm font-medium">
                             <Keyboard className="w-4 h-4" />
                             <span>Shortcuts</span>
                         </div>
 
-                        {/* Two rows of shortcuts */}
+
                         <div className="flex items-center justify-center gap-3 text-xs">
                             {shortcuts.slice(0, 3).map((shortcut, index) => renderShortcut(shortcut, index, true))}
                         </div>
@@ -138,15 +138,15 @@ const KeyboardShortcuts = () => {
                     </div>
                 </div>
 
-                {/* Mobile Layout */}
+
                 <div className="block md:hidden py-2">
                     <div className="flex flex-col gap-1.5">
-                        {/* Header */}
+
                         <div className="flex items-center justify-center gap-1.5 text-base font-semibold mb-2">
                             <Keyboard className="w-4 h-4" />
                             <span>Shortcuts</span>
                         </div>
-                        {/* Grid of shortcuts */}
+
                         <div className="grid grid-cols-3 gap-2 justify-items-center">
                             {mobileShortcuts.map((shortcut, index) => renderMobileShortcut(shortcut, index))}
                         </div>
