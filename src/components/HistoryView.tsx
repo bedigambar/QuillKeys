@@ -213,7 +213,7 @@ const HistoryView = () => {
                             variants={containerVariants}
                             className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
                         >
-                            {stats.map((stat, index) => {
+                            {stats.map((stat, _index) => {
                                 const IconComponent = stat.icon;
                                 return (
                                     <motion.div
