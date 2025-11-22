@@ -127,11 +127,11 @@ const ControlPanel = () => {
                 </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-center pt-4 border-t border-gray-200 dark:border-gray-800">
+            <div className="flex flex-row gap-4 sm:gap-6 items-center justify-center pt-4 border-t border-gray-200 dark:border-gray-800 flex-wrap">
                 <div className="flex gap-1 sm:gap-2 items-center">
                     <Type className="w-4 h-4 text-gray-500" />
                     <Select value={fontTheme} onValueChange={(v) => setFontTheme(v as any)}>
-                        <SelectTrigger className="w-[100px] h-8 text-xs">
+                        <SelectTrigger className="w-[85px] sm:w-[100px] h-8 text-xs px-2">
                             <SelectValue placeholder="Font" />
                         </SelectTrigger>
                         <SelectContent>
@@ -145,7 +145,7 @@ const ControlPanel = () => {
                 <div className="flex gap-1 sm:gap-2 items-center">
                     <MousePointer2 className="w-4 h-4 text-gray-500" />
                     <Select value={caretStyle} onValueChange={(v) => setCaretStyle(v as any)}>
-                        <SelectTrigger className="w-[100px] h-8 text-xs">
+                        <SelectTrigger className="w-[85px] sm:w-[100px] h-8 text-xs px-2">
                             <SelectValue placeholder="Caret" />
                         </SelectTrigger>
                         <SelectContent>

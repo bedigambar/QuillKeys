@@ -14,10 +14,14 @@ Why type mundane sentences when you can type wisdom that has shaped human though
 
 - **🎭 Literary Passages**: Type through authentic excerpts from masterworks of existential and philosophical literature
 - **📊 Real-time Analytics**: Track your WPM, accuracy, and progress as you type
-- **🌓 Dark/Light Mode**: Choose your ambiance—whether you prefer the depth of darkness or the clarity of light
-- **⌨️ Multiple Test Lengths**: 15, 30, 60-second or customised typing sessions to match your pace
+- **📈 History Tracking**: View your complete typing test history with detailed statistics, performance charts, and progress over time
+- **� Font Themes**: Choose from 3 beautiful font styles (Mono, Sans, Serif) to match your preference
+- **✨ Caret Customization**: Select your preferred caret style (Block, Line, or Underline)
+- **🧘 Zen Mode**: Distraction-free typing experience with a minimalist interface
+- **�🌓 Dark/Light Mode**: Choose your ambiance—whether you prefer the depth of darkness or the clarity of light
+- **🌙 Customised Test Lengths**: 15, 30, 60-second or customised typing sessions to match your pace
 - **📱 Fully Responsive**: Practice your craft on any device, anywhere
-- **🎨 Beautiful UI**: Clean, distraction-free interface built with modern design principles
+- **🎨 Beautiful UI**: Clean, distraction-free interface built with modern design principles and smooth animations
 
 ## 🖤 Meet Your Literary Mentors
 

@@ -13,6 +13,17 @@ const TypingArea = () => {
         }
     }, [status]);
 
+    const Caret = ({ style }: { style: string }) => (
+        <motion.span
+            layoutId="caret"
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            className={`absolute pointer-events-none z-10 ${style === 'block' ? 'inset-0 bg-primary/30 animate-pulse' :
+                    style === 'line' ? '-left-[1px] top-0 bottom-0 w-[2px] bg-primary animate-pulse' :
+                        'left-0 right-0 bottom-0 h-[2px] bg-primary animate-pulse'
+                }`}
+        />
+    );
+
     const renderText = () => {
         const words = currentText.split(' ');
         const typedWords = typedText.split(' ');
@@ -22,27 +33,25 @@ const TypingArea = () => {
             const isCurrentWord = wordIndex === typedWords.length - 1;
 
             return (
-                <span key={wordIndex} className="inline-block mr-2 mb-1">
+                <span key={wordIndex} className="inline-block mr-2 mb-1 relative">
                     {word.split('').map((char, charIndex) => {
                         const typedChar = typedWord[charIndex];
-                        let className = 'text-muted-foreground';
+                        let className = 'relative text-muted-foreground';
+                        const isCorrect = typedChar === char;
+                        const isError = typedChar !== undefined && typedChar !== char;
 
-                        if (typedChar !== undefined) {
-                            className = typedChar === char ? 'text-green-600 dark:text-green-400 font-semibold scale-[1.05] transition-transform duration-100'
-                                : 'text-red-600 dark:text-red-400';
-                        } else if (isCurrentWord && charIndex === typedWord.length) {
-                            if (caretStyle === 'block') {
-                                className = 'bg-primary text-primary-foreground animate-pulse';
-                            } else if (caretStyle === 'line') {
-                                className = 'border-l-2 border-primary animate-pulse';
-                            } else {
-                                className = 'border-b-2 border-primary animate-pulse';
-                            }
+                        if (isCorrect) {
+                            className = 'relative text-green-600 dark:text-green-400 font-semibold';
+                        } else if (isError) {
+                            className = 'relative text-red-600 dark:text-red-400';
                         }
+
+                        const showCaret = isCurrentWord && charIndex === typedWord.length;
 
                         return (
                             <span key={charIndex} className={className}>
                                 {char}
+                                {showCaret && <Caret style={caretStyle} />}
                             </span>
                         );
                     })}
@@ -64,7 +73,7 @@ const TypingArea = () => {
         >
 
             <div className={`p-3 sm:p-4 md:p-6 min-h-[150px] sm:min-h-[200px] ${fontTheme === 'serif' ? 'font-serif' :
-                    fontTheme === 'mono' ? 'font-mono' : 'font-sans'
+                fontTheme === 'mono' ? 'font-mono' : 'font-sans'
                 }`}>
 
                 <div className='text-base sm:text-lg md:text-xl leading-relaxed'>

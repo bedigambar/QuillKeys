@@ -1,7 +1,7 @@
 import { useTypingStore } from '@/store/typing-store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, Legend } from 'recharts';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { Trophy, Target, TrendingUp, Award, Trash2, Filter, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
@@ -113,16 +113,45 @@ const HistoryView = () => {
         }
     ];
 
+    // Animation Variants
+    const containerVariants: Variants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const itemVariants: Variants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                type: 'spring',
+                stiffness: 300,
+                damping: 24
+            }
+        }
+    };
+
     return (
         <div className="container mx-auto px-4 py-8 max-w-6xl space-y-8">
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
             >
                 <div className="flex flex-wrap gap-3 justify-between items-center mb-6">
-                    <h2 className="text-3xl font-bold">Your Progress</h2>
-                    <div className="flex gap-2">
+                    <motion.h2
+                        variants={itemVariants}
+                        className="text-3xl font-bold"
+                    >
+                        Your Progress
+                    </motion.h2>
+                    <motion.div variants={itemVariants} className="flex gap-2">
                         <Button
                             variant="default"
                             size="sm"
@@ -143,42 +172,57 @@ const HistoryView = () => {
                                 Clear History
                             </Button>
                         )}
-                    </div>
+                    </motion.div>
                 </div>
 
                 {testResults.length === 0 ? (
-                    <Card className="border-dashed">
-                        <CardContent className="p-12 text-center">
-                            <div className="flex flex-col items-center gap-4">
-                                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-                                    <Trophy className="w-10 h-10 text-primary" />
+                    <motion.div variants={itemVariants}>
+                        <Card className="border-dashed">
+                            <CardContent className="p-12 text-center">
+                                <div className="flex flex-col items-center gap-4">
+                                    <motion.div
+                                        className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center"
+                                        animate={{
+                                            scale: [1, 1.1, 1],
+                                            rotate: [0, 5, -5, 0]
+                                        }}
+                                        transition={{
+                                            duration: 4,
+                                            repeat: Infinity,
+                                            ease: "easeInOut"
+                                        }}
+                                    >
+                                        <Trophy className="w-10 h-10 text-primary" />
+                                    </motion.div>
+                                    <div>
+                                        <h3 className="text-xl font-semibold mb-2">No test history yet</h3>
+                                        <p className="text-muted-foreground mb-4">
+                                            Complete your first typing test to start tracking your progress!
+                                        </p>
+                                        <Button onClick={() => navigate('/typing')}>
+                                            Start Typing Test
+                                        </Button>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h3 className="text-xl font-semibold mb-2">No test history yet</h3>
-                                    <p className="text-muted-foreground mb-4">
-                                        Complete your first typing test to start tracking your progress!
-                                    </p>
-                                    <Button onClick={() => navigate('/typing')}>
-                                        Start Typing Test
-                                    </Button>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <motion.div
+                            variants={containerVariants}
+                            className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+                        >
                             {stats.map((stat, index) => {
                                 const IconComponent = stat.icon;
                                 return (
                                     <motion.div
                                         key={stat.label}
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        transition={{ delay: index * 0.1 }}
+                                        variants={itemVariants}
+                                        whileHover={{ y: -5, transition: { duration: 0.2 } }}
                                         className="h-full"
                                     >
-                                        <Card className={`${stat.bgColor} border-0 h-full`}>
+                                        <Card className={`${stat.bgColor} border-0 h-full transition-shadow hover:shadow-md`}>
                                             <CardContent className="p-4 h-full flex items-center">
                                                 <div className="flex items-center gap-3 w-full">
                                                     <IconComponent className={`w-8 h-8 flex-shrink-0 ${stat.color}`} />
@@ -192,119 +236,123 @@ const HistoryView = () => {
                                     </motion.div>
                                 );
                             })}
-                        </div>
+                        </motion.div>
 
-                        <Card className="mb-8">
-                            <CardHeader>
-                                <CardTitle className="text-lg sm:text-xl">Performance Trend (Last 20 Tests)</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="h-[250px] sm:h-[350px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <AreaChart data={chartData}>
-                                            <defs>
-                                                <linearGradient id="colorWpm" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="5%" stopColor="#FFD700" stopOpacity={0.3} />
-                                                    <stop offset="95%" stopColor="#FFD700" stopOpacity={0} />
-                                                </linearGradient>
-                                                <linearGradient id="colorAccuracy" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                                                </linearGradient>
-                                            </defs>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#444444" />
-                                            <Legend
-                                                verticalAlign="top"
-                                                height={36}
-                                                wrapperStyle={{ fontSize: '12px' }}
-                                                formatter={(value) => {
-                                                    if (value === 'wpm') return 'WPM';
-                                                    if (value === 'accuracy') return 'Accuracy (%)';
-                                                    return value;
-                                                }}
-                                            />
-                                            <XAxis
-                                                dataKey="index"
-                                                stroke="#888888"
-                                                tick={{ fill: '#888888', fontSize: 12 }}
-                                                label={{
-                                                    value: 'Test Number',
-                                                    position: 'insideBottom',
-                                                    offset: -5,
-                                                    fill: '#888888',
-                                                    fontSize: 12
-                                                }}
-                                            />
-                                            <YAxis
-                                                yAxisId="left"
-                                                stroke="#888888"
-                                                tick={{ fill: '#888888', fontSize: 12 }}
-                                                label={{
-                                                    value: 'WPM',
-                                                    angle: -90,
-                                                    position: 'insideLeft',
-                                                    fill: '#FFD700',
-                                                    fontSize: 12,
-                                                    style: { textAnchor: 'middle' }
-                                                }}
-                                            />
-                                            <YAxis
-                                                yAxisId="right"
-                                                orientation="right"
-                                                stroke="#10b981"
-                                                tick={{ fill: '#888888', fontSize: 12 }}
-                                                label={{
-                                                    value: 'Accuracy %',
-                                                    angle: 90,
-                                                    position: 'insideRight',
-                                                    fill: '#10b981',
-                                                    fontSize: 12,
-                                                    style: { textAnchor: 'middle' }
-                                                }}
-                                            />
-                                            <Tooltip
-                                                contentStyle={{
-                                                    backgroundColor: 'hsl(var(--background))',
-                                                    border: '1px solid hsl(var(--border))',
-                                                    borderRadius: '8px',
-                                                    fontSize: '12px'
-                                                }}
-                                                labelFormatter={(label, payload) => {
-                                                    if (payload && payload.length > 0) {
-                                                        return payload[0].payload.fullDate;
-                                                    }
-                                                    return `Test ${label}`;
-                                                }}
-                                            />
-                                            <Area
-                                                yAxisId="left"
-                                                type="monotone"
-                                                dataKey="wpm"
-                                                stroke="#FFD700"
-                                                strokeWidth={3}
-                                                fill="url(#colorWpm)"
-                                                dot={{ fill: "#FFD700", r: 4 }}
-                                            />
-                                            <Area
-                                                yAxisId="right"
-                                                type="monotone"
-                                                dataKey="accuracy"
-                                                stroke="#10b981"
-                                                strokeWidth={2}
-                                                fill="url(#colorAccuracy)"
-                                                dot={{ fill: "#10b981", r: 3 }}
-                                            />
-                                        </AreaChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </CardContent>
-                        </Card>
+                        <motion.div variants={itemVariants}>
+                            <Card className="mb-8 overflow-hidden">
+                                <CardHeader>
+                                    <CardTitle className="text-lg sm:text-xl">Performance Trend (Last 20 Tests)</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="h-[250px] sm:h-[350px] w-full">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart data={chartData}>
+                                                <defs>
+                                                    <linearGradient id="colorWpm" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#FFD700" stopOpacity={0.3} />
+                                                        <stop offset="95%" stopColor="#FFD700" stopOpacity={0} />
+                                                    </linearGradient>
+                                                    <linearGradient id="colorAccuracy" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                                    </linearGradient>
+                                                </defs>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#444444" />
+                                                <Legend
+                                                    verticalAlign="top"
+                                                    height={36}
+                                                    wrapperStyle={{ fontSize: '12px' }}
+                                                    formatter={(value) => {
+                                                        if (value === 'wpm') return 'WPM';
+                                                        if (value === 'accuracy') return 'Accuracy (%)';
+                                                        return value;
+                                                    }}
+                                                />
+                                                <XAxis
+                                                    dataKey="index"
+                                                    stroke="#888888"
+                                                    tick={{ fill: '#888888', fontSize: 12 }}
+                                                    label={{
+                                                        value: 'Test Number',
+                                                        position: 'insideBottom',
+                                                        offset: -5,
+                                                        fill: '#888888',
+                                                        fontSize: 12
+                                                    }}
+                                                />
+                                                <YAxis
+                                                    yAxisId="left"
+                                                    stroke="#888888"
+                                                    tick={{ fill: '#888888', fontSize: 12 }}
+                                                    label={{
+                                                        value: 'WPM',
+                                                        angle: -90,
+                                                        position: 'insideLeft',
+                                                        fill: '#FFD700',
+                                                        fontSize: 12,
+                                                        style: { textAnchor: 'middle' }
+                                                    }}
+                                                />
+                                                <YAxis
+                                                    yAxisId="right"
+                                                    orientation="right"
+                                                    stroke="#10b981"
+                                                    tick={{ fill: '#888888', fontSize: 12 }}
+                                                    label={{
+                                                        value: 'Accuracy %',
+                                                        angle: 90,
+                                                        position: 'insideRight',
+                                                        fill: '#10b981',
+                                                        fontSize: 12,
+                                                        style: { textAnchor: 'middle' }
+                                                    }}
+                                                />
+                                                <Tooltip
+                                                    contentStyle={{
+                                                        backgroundColor: 'hsl(var(--background))',
+                                                        border: '1px solid hsl(var(--border))',
+                                                        borderRadius: '8px',
+                                                        fontSize: '12px'
+                                                    }}
+                                                    labelFormatter={(label, payload) => {
+                                                        if (payload && payload.length > 0) {
+                                                            return payload[0].payload.fullDate;
+                                                        }
+                                                        return `Test ${label}`;
+                                                    }}
+                                                />
+                                                <Area
+                                                    yAxisId="left"
+                                                    type="monotone"
+                                                    dataKey="wpm"
+                                                    stroke="#FFD700"
+                                                    strokeWidth={3}
+                                                    fill="url(#colorWpm)"
+                                                    dot={{ fill: "#FFD700", r: 4 }}
+                                                    animationDuration={1500}
+                                                />
+                                                <Area
+                                                    yAxisId="right"
+                                                    type="monotone"
+                                                    dataKey="accuracy"
+                                                    stroke="#10b981"
+                                                    strokeWidth={2}
+                                                    fill="url(#colorAccuracy)"
+                                                    dot={{ fill: "#10b981", r: 3 }}
+                                                    animationDuration={1500}
+                                                />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </motion.div>
 
-                        <div className="flex flex-wrap gap-4 items-center mb-4">
+                        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 items-start sm:items-center mb-4">
                             <h3 className="text-xl font-semibold">Recent Sessions</h3>
-                            <div className="flex gap-2 ml-auto">
+                            <div className="flex flex-wrap gap-2 sm:ml-auto w-full sm:w-auto">
                                 <Select value={filterCategory} onValueChange={setFilterCategory}>
-                                    <SelectTrigger className="w-[180px]">
+                                    <SelectTrigger className="w-full sm:w-[180px] flex-1">
                                         <Filter className="w-4 h-4 mr-2" />
                                         <SelectValue placeholder="Filter by category" />
                                     </SelectTrigger>
@@ -318,7 +366,7 @@ const HistoryView = () => {
                                 </Select>
 
                                 <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
-                                    <SelectTrigger className="w-[150px]">
+                                    <SelectTrigger className="w-full sm:w-[150px] flex-1">
                                         <SelectValue placeholder="Sort by" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -328,18 +376,20 @@ const HistoryView = () => {
                                     </SelectContent>
                                 </Select>
                             </div>
-                        </div>
+                        </motion.div>
 
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {sortedResults.map((result, index) => (
+                        <motion.div
+                            variants={containerVariants}
+                            className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+                        >
+                            {sortedResults.map((result) => (
                                 <motion.div
                                     key={result.timestamp}
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: index * 0.03 }}
-                                    whileHover={{ scale: 1.02 }}
+                                    variants={itemVariants}
+                                    whileHover={{ scale: 1.02, y: -2 }}
+                                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                                 >
-                                    <Card className="hover:shadow-lg transition-shadow">
+                                    <Card className="hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20">
                                         <CardContent className="p-5">
                                             <div className="flex justify-between items-start mb-3">
                                                 <div>
@@ -378,14 +428,16 @@ const HistoryView = () => {
                                     </Card>
                                 </motion.div>
                             ))}
-                        </div>
+                        </motion.div>
 
                         {sortedResults.length === 0 && (
-                            <Card className="border-dashed">
-                                <CardContent className="p-8 text-center text-muted-foreground">
-                                    No results found for the selected filters.
-                                </CardContent>
-                            </Card>
+                            <motion.div variants={itemVariants}>
+                                <Card className="border-dashed">
+                                    <CardContent className="p-8 text-center text-muted-foreground">
+                                        No results found for the selected filters.
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
                         )}
                     </>
                 )}
