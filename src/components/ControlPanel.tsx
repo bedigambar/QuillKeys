@@ -131,13 +131,16 @@ const ControlPanel = () => {
                 <div className="flex gap-1 sm:gap-2 items-center">
                     <Type className="w-4 h-4 text-gray-500" />
                     <Select value={fontTheme} onValueChange={(v) => setFontTheme(v as any)}>
-                        <SelectTrigger className="w-[85px] sm:w-[100px] h-8 text-xs px-2">
+                        <SelectTrigger className="w-[110px] sm:w-[130px] h-8 text-xs px-2">
                             <SelectValue placeholder="Font" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="serif">Serif</SelectItem>
                             <SelectItem value="sans">Sans</SelectItem>
                             <SelectItem value="mono">Mono</SelectItem>
+                            <SelectItem value="merriweather">Merriweather</SelectItem>
+                            <SelectItem value="roboto">Roboto Mono</SelectItem>
+                            <SelectItem value="fira">Fira Code</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>

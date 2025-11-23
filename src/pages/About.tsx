@@ -48,7 +48,6 @@ const About = () => {
             <Header />
 
             <main className="container mx-auto px-4 py-12 sm:py-20">
-                {/* Hero Section */}
                 <section className="max-w-4xl mx-auto text-center mb-20 sm:mb-32">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -74,7 +73,6 @@ const About = () => {
                     </motion.div>
                 </section>
 
-                {/* Authors Section */}
                 <section className="max-w-6xl mx-auto">
                     <motion.h2
                         className="text-3xl sm:text-4xl font-serif text-center mb-12 sm:mb-16"
@@ -120,7 +118,6 @@ const About = () => {
                     </div>
                 </section>
 
-                {/* Bottom CTA */}
                 <section className="text-center mt-20 sm:mt-32">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}

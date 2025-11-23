@@ -18,15 +18,14 @@ const ResultCard = () => {
     if (cardRef.current === null) return;
 
     try {
-      // Create a clone of the card to modify styles for export without affecting the UI
       const dataUrl = await toPng(cardRef.current, {
         cacheBust: true,
         backgroundColor: isDarkMode ? '#09090b' : '#ffffff',
-        pixelRatio: 2, // Higher quality
+        pixelRatio: 2,
         style: {
           transform: 'scale(1)',
           margin: '0',
-          width: 'auto', // Let it fit content
+          width: 'auto',
           height: 'auto',
           maxHeight: 'none',
           maxWidth: 'none'
@@ -44,32 +43,25 @@ const ResultCard = () => {
   };
 
   useEffect(() => {
-    // Check for dark mode preference
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     setIsDarkMode(mediaQuery.matches);
 
-    // Listen for changes
     const handleChange = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
     mediaQuery.addEventListener('change', handleChange);
 
-    // Clean up the event listener
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
   const actualDuration = typeof timerDuration === 'number' ? timerDuration : 120;
   const timeTaken = actualDuration - timeLeft;
 
-  // Calculate peak WPM and consistency score
   const peakWpm = wpmHistory.length > 0 ? Math.max(...wpmHistory.map(d => d.wpm)) : wpm;
 
-  // Use the final WPM from store as the average/net WPM
   const avgWpm = wpm;
 
-  // Consistency score: Lower standard deviation = more consistent (higher score)
   const calculateConsistency = () => {
     if (wpmHistory.length < 2) return 100;
 
-    // Calculate mean of history for consistency check
     const historyMean = wpmHistory.reduce((sum, d) => sum + d.wpm, 0) / wpmHistory.length;
 
     if (historyMean === 0) return 100;
@@ -77,12 +69,8 @@ const ResultCard = () => {
     const variance = wpmHistory.reduce((sum, d) => sum + Math.pow(d.wpm - historyMean, 2), 0) / wpmHistory.length;
     const stdDev = Math.sqrt(variance);
 
-    // Coefficient of Variation (CV) = StdDev / Mean
-    // A lower CV means more consistent typing relative to speed
     const cv = stdDev / historyMean;
 
-    // Convert to score: 100 * (1 - CV)
-    // We'll be a bit lenient and map CV 0-0.5 to 100-50, and anything above 1.0 to 0
     const consistency = 100 * (1 - cv);
 
     return Math.round(Math.max(0, Math.min(100, consistency)));
@@ -114,8 +102,7 @@ const ResultCard = () => {
     }
   ];
 
-  // Define chart colors
-  const chartLineColor = '#3b82f6'; // blue-500
+  const chartLineColor = '#3b82f6';
   const chartAxisColor = isDarkMode ? '#aaa' : '#555';
   const chartGridColor = isDarkMode ? '#333' : '#ccc';
   const tooltipBgColor = isDarkMode ? '#222' : 'white';

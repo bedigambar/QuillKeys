@@ -15,7 +15,7 @@ Why type mundane sentences when you can type wisdom that has shaped human though
 - **🎭 Literary Passages**: Type through authentic excerpts from masterworks of existential and philosophical literature
 - **📊 Real-time Analytics**: Track your WPM, accuracy, and progress as you type
 - **📈 History Tracking**: View your complete typing test history with detailed statistics, performance charts, and progress over time
-- **� Font Themes**: Choose from 3 beautiful font styles (Mono, Sans, Serif) to match your preference
+- **� Font Themes**: Choose from 6 beautiful font styles (Mono, Sans, Serif, Merriweather, Roboto, Fira) to match your preference
 - **✨ Caret Customization**: Select your preferred caret style (Block, Line, or Underline)
 - **🧘 Zen Mode**: Distraction-free typing experience with a minimalist interface
 - **�🌓 Dark/Light Mode**: Choose your ambiance—whether you prefer the depth of darkness or the clarity of light

@@ -14,7 +14,7 @@ const Header = () => {
     if (zenMode) return null;
 
     return (
-        <div className={`container mx-auto px-4 flex items-center justify-between ${isHomePage ? 'py-6 pt-8' : 'py-4'}`}>
+        <div className={`container mx-auto px-4 flex items-center justify-between py-4`}>
 
             <div className='flex items-center gap-2 sm:gap-3 cursor-pointer' onClick={() => navigate('/')}>
                 <KeyboardIcon className='h-8 w-8 sm:h-10 sm:w-10' />

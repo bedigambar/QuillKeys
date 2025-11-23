@@ -4,7 +4,7 @@ import { getRandomQuestion } from '@/data/questions';
 
 export type TestStatus = 'idle' | 'countdown' | 'running' | 'completed';
 export type TimerOption = 30 | 60 | 180 | 'custom';
-export type FontTheme = 'serif' | 'sans' | 'mono';
+export type FontTheme = 'serif' | 'sans' | 'mono' | 'merriweather' | 'roboto' | 'fira';
 export type CaretStyle = 'block' | 'line' | 'underline';
 
 
@@ -21,6 +21,52 @@ export interface WpmDataPoint {
   time: number;
   wpm: number;
 }
+
+const getWordBasedStats = (currentText: string, typedText: string) => {
+  const words = currentText.split(' ');
+  const typedWords = typedText.split(' ');
+
+  let correctChars = 0;
+  let incorrectChars = 0;
+  let extraChars = 0;
+  let missedChars = 0;
+
+  typedWords.forEach((typedWord, index) => {
+    const targetWord = words[index];
+
+    if (!targetWord) {
+      extraChars += typedWord.length;
+      return;
+    }
+
+    const isLastWord = index === typedWords.length - 1;
+
+    for (let i = 0; i < Math.max(typedWord.length, targetWord.length); i++) {
+      const typedChar = typedWord[i];
+      const targetChar = targetWord[i];
+
+      if (typedChar !== undefined && targetChar !== undefined) {
+        if (typedChar === targetChar) {
+          correctChars++;
+        } else {
+          incorrectChars++;
+        }
+      } else if (typedChar !== undefined && targetChar === undefined) {
+        extraChars++;
+      } else if (typedChar === undefined && targetChar !== undefined) {
+        if (!isLastWord) {
+          missedChars++;
+        }
+      }
+    }
+
+    if (!isLastWord) {
+      correctChars++;
+    }
+  });
+
+  return { correctChars, incorrectChars, extraChars, missedChars };
+};
 
 interface TypingState {
 
@@ -44,13 +90,14 @@ interface TypingState {
 
   totalCorrectChars: number;
   totalTypedChars: number;
-  grossTypedChars: number; // Total keystrokes including backspaces
-  lastWpmUpdate: number; // Timestamp of last WPM update for instantaneous calc
-  lastCorrectChars: number; // Correct chars at last WPM update
+  grossTypedChars: number;
+  lastWpmUpdate: number;
+  lastCorrectChars: number;
 
   fontTheme: FontTheme;
   caretStyle: CaretStyle;
   zenMode: boolean;
+  smoothCaret: boolean;
 
 
 
@@ -73,6 +120,7 @@ interface TypingState {
   setFontTheme: (theme: FontTheme) => void;
   setCaretStyle: (style: CaretStyle) => void;
   toggleZenMode: () => void;
+  toggleSmoothCaret: () => void;
 
   clearHistory: () => void;
 }
@@ -99,9 +147,10 @@ export const useTypingStore = create<TypingState>()(
       lastWpmUpdate: 0,
       lastCorrectChars: 0,
 
-      fontTheme: 'serif',
+      fontTheme: 'roboto',
       caretStyle: 'line',
       zenMode: false,
+      smoothCaret: false,
 
 
 
@@ -229,25 +278,17 @@ export const useTypingStore = create<TypingState>()(
       },
 
       calculateStats: () => {
-        const { typedText, currentText, timerDuration, customTimerDuration, timeLeft, totalCorrectChars, grossTypedChars } = get();
+        const { typedText, currentText, timerDuration, customTimerDuration, timeLeft, totalCorrectChars } = get();
         const actualDuration = timerDuration === 'custom' ? customTimerDuration : timerDuration;
 
+        const { correctChars, incorrectChars, extraChars, missedChars } = getWordBasedStats(currentText, typedText);
+        const cumulativeCorrectChars = totalCorrectChars + correctChars;
 
-        let currentCorrectChars = 0;
-        for (let i = 0; i < typedText.length; i++) {
-          if (i < currentText.length && typedText[i] === currentText[i]) {
-            currentCorrectChars++;
-          }
-        }
-
-        const cumulativeCorrectChars = totalCorrectChars + currentCorrectChars;
-
-        const accuracy = grossTypedChars > 0 ? Math.round((cumulativeCorrectChars / grossTypedChars) * 100) : 100;
-
+        const totalEntries = cumulativeCorrectChars + incorrectChars + extraChars + missedChars;
+        const accuracy = totalEntries > 0 ? Math.round((cumulativeCorrectChars / totalEntries) * 100) : 100;
 
         const timeElapsedSeconds = actualDuration - timeLeft;
         const timeElapsedMinutes = timeElapsedSeconds / 60;
-
 
         const minTimeSeconds = 1;
         let wpm = 0;
@@ -255,9 +296,6 @@ export const useTypingStore = create<TypingState>()(
         if (timeElapsedSeconds >= minTimeSeconds) {
           const correctWords = cumulativeCorrectChars / 5;
           wpm = Math.round(correctWords / timeElapsedMinutes);
-        } else {
-
-          wpm = 0;
         }
 
         set({ wpm, accuracy });
@@ -269,13 +307,8 @@ export const useTypingStore = create<TypingState>()(
         const timeElapsed = actualDuration - timeLeft;
         const now = Date.now();
 
-        let currentCorrectChars = 0;
-        for (let i = 0; i < typedText.length; i++) {
-          if (i < currentText.length && typedText[i] === currentText[i]) {
-            currentCorrectChars++;
-          }
-        }
-        const totalCorrect = totalCorrectChars + currentCorrectChars;
+        const { correctChars } = getWordBasedStats(currentText, typedText);
+        const totalCorrect = totalCorrectChars + correctChars;
 
         const deltaCorrect = totalCorrect - lastCorrectChars;
 
@@ -300,20 +333,13 @@ export const useTypingStore = create<TypingState>()(
         const { category, status, typedText, currentText, totalCorrectChars, totalTypedChars } = get();
         if (status === 'running') {
 
-          let currentCorrectChars = 0;
-          for (let i = 0; i < typedText.length; i++) {
-            if (i < currentText.length && typedText[i] === currentText[i]) {
-              currentCorrectChars++;
-            }
-          }
+          const { correctChars } = getWordBasedStats(currentText, typedText);
 
-
-          // Synchronous update to prevent race condition
           const newQuestion = getRandomQuestion(category);
           set({
             currentText: newQuestion.text,
             typedText: '',
-            totalCorrectChars: totalCorrectChars + currentCorrectChars,
+            totalCorrectChars: totalCorrectChars + correctChars,
             totalTypedChars: totalTypedChars + typedText.length
           });
         }
@@ -322,6 +348,7 @@ export const useTypingStore = create<TypingState>()(
       setFontTheme: (theme) => set({ fontTheme: theme }),
       setCaretStyle: (style) => set({ caretStyle: style }),
       toggleZenMode: () => set((state) => ({ zenMode: !state.zenMode })),
+      toggleSmoothCaret: () => set((state) => ({ smoothCaret: !state.smoothCaret })),
 
 
 
@@ -337,7 +364,8 @@ export const useTypingStore = create<TypingState>()(
         category: state.category,
         testResults: state.testResults,
         fontTheme: state.fontTheme,
-        caretStyle: state.caretStyle
+        caretStyle: state.caretStyle,
+        smoothCaret: state.smoothCaret
       })
     }
   )

@@ -13,7 +13,6 @@ export const useKeyboardShortcuts = ({ onRestartTest, onStartTest }: KeyboardSho
     const [sequenceKeys, setSequenceKeys] = useState<string[]>([]);
     const [sequenceTimer, setSequenceTimer] = useState<NodeJS.Timeout | null>(null);
 
-    // Clear sequence after 2 seconds of inactivity
     const clearSequence = useCallback(() => {
         setSequenceKeys([]);
         if (sequenceTimer) {
@@ -31,11 +30,9 @@ export const useKeyboardShortcuts = ({ onRestartTest, onStartTest }: KeyboardSho
         return false;
     }, [status, resetTest, onRestartTest]);
 
-    // Check for sequence shortcuts
     const checkSequenceShortcuts = useCallback((currentSequence: string[]) => {
         const last3 = currentSequence.slice(-3);
 
-        // Triple Enter or Triple Space to start test
         if (
             (last3.every(key => key === 'Enter') || last3.every(key => key === ' ')) &&
             status === 'idle'
@@ -51,17 +48,14 @@ export const useKeyboardShortcuts = ({ onRestartTest, onStartTest }: KeyboardSho
         return false;
     }, [status, category, setCurrentText, startCountdown, onStartTest, clearSequence]);
 
-    // Add key to sequence and reset timer, then check shortcut
     const addToSequence = useCallback((key: string) => {
         setSequenceKeys(prev => {
             const newSequence = [...prev, key];
             if (newSequence.length > 5) {
-                // Only keep last 5
                 return newSequence.slice(-5);
             }
             return newSequence;
         });
-        // Reset timer
         if (sequenceTimer) {
             clearTimeout(sequenceTimer);
         }
@@ -69,7 +63,6 @@ export const useKeyboardShortcuts = ({ onRestartTest, onStartTest }: KeyboardSho
         setSequenceTimer(timer);
     }, [sequenceTimer, clearSequence]);
 
-    // Listens for sequenceKeys changes and check shortcut
     useEffect(() => {
         if (sequenceKeys.length >= 3) {
             checkSequenceShortcuts(sequenceKeys);
@@ -91,20 +84,17 @@ export const useKeyboardShortcuts = ({ onRestartTest, onStartTest }: KeyboardSho
 
             setPressedKeys(prev => new Set([...prev, key]));
 
-            // Tab + Enter for restart
             if (key === 'Enter' && pressedKeys.has('Tab')) {
                 event.preventDefault();
                 handleRestartShortcut();
                 return;
             }
 
-            // Add to sequence for multi-key shortcuts
             if (key === 'Enter' || key === ' ') {
                 event.preventDefault();
                 addToSequence(key);
             }
 
-            // Escape to reset
             if (key === 'Escape') {
                 event.preventDefault();
                 if (status !== 'idle') {
@@ -113,13 +103,11 @@ export const useKeyboardShortcuts = ({ onRestartTest, onStartTest }: KeyboardSho
                 }
             }
 
-            // Ctrl/Cmd + R for restart
             if ((event.ctrlKey || event.metaKey) && key === 'r') {
                 event.preventDefault();
                 handleRestartShortcut();
             }
 
-            // Ctrl/Cmd + Enter to start test
             if ((event.ctrlKey || event.metaKey) && key === 'Enter' && status === 'idle') {
                 event.preventDefault();
                 const question = getRandomQuestion(category);
@@ -137,7 +125,6 @@ export const useKeyboardShortcuts = ({ onRestartTest, onStartTest }: KeyboardSho
             });
         };
 
-        // Add global event listeners
         document.addEventListener('keydown', handleKeyDown);
         document.addEventListener('keyup', handleKeyUp);
 

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Keyboard, RotateCcw, Play, Zap } from 'lucide-react';
+import { useTypingStore } from '@/store/typing-store';
 
 interface ShortcutItem {
     keys: string[];
@@ -8,6 +9,10 @@ interface ShortcutItem {
 }
 
 const KeyboardShortcuts = () => {
+    const { zenMode } = useTypingStore();
+
+    if (zenMode) return null;
+
     const shortcuts: ShortcutItem[] = [
         {
             keys: ['Tab', '+', 'Enter'],

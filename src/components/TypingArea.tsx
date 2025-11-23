@@ -2,9 +2,25 @@ import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useTypingStore } from '@/store/typing-store';
 
+const Caret = ({ style, className = '', wpm, smoothCaret }: { style: string, className?: string, wpm: number, smoothCaret: boolean }) => {
+    const stiffness = Math.min(2500, 500 + (wpm * 15));
+    const damping = Math.min(100, 30 + (wpm * 0.5));
+
+    return (
+        <motion.span
+            layoutId="caret"
+            transition={smoothCaret ? { type: "spring", stiffness, damping } : { duration: 0 }}
+            className={`absolute pointer-events-none z-10 ${style === 'block' ? 'inset-0 bg-primary/30 animate-pulse' :
+                style === 'line' ? 'top-0 bottom-0 w-[2px] bg-primary animate-pulse' :
+                    'left-0 right-0 bottom-0 h-[2px] bg-primary animate-pulse'
+                } ${className}`}
+        />
+    );
+};
+
 const TypingArea = () => {
 
-    const { currentText, typedText, setTypedText, status, countdownTime, fontTheme, caretStyle } = useTypingStore();
+    const { currentText, typedText, setTypedText, status, countdownTime, fontTheme, caretStyle, wpm, smoothCaret } = useTypingStore();
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -13,17 +29,6 @@ const TypingArea = () => {
         }
     }, [status]);
 
-    const Caret = ({ style }: { style: string }) => (
-        <motion.span
-            layoutId="caret"
-            transition={{ type: "spring", stiffness: 500, damping: 30 }}
-            className={`absolute pointer-events-none z-10 ${style === 'block' ? 'inset-0 bg-primary/30 animate-pulse' :
-                    style === 'line' ? '-left-[1px] top-0 bottom-0 w-[2px] bg-primary animate-pulse' :
-                        'left-0 right-0 bottom-0 h-[2px] bg-primary animate-pulse'
-                }`}
-        />
-    );
-
     const renderText = () => {
         const words = currentText.split(' ');
         const typedWords = typedText.split(' ');
@@ -31,6 +36,7 @@ const TypingArea = () => {
         return words.map((word, wordIndex) => {
             const typedWord = typedWords[wordIndex] || '';
             const isCurrentWord = wordIndex === typedWords.length - 1;
+            const isSubmitted = wordIndex < typedWords.length - 1;
 
             return (
                 <span key={wordIndex} className="inline-block mr-2 mb-1 relative">
@@ -39,10 +45,11 @@ const TypingArea = () => {
                         let className = 'relative text-muted-foreground';
                         const isCorrect = typedChar === char;
                         const isError = typedChar !== undefined && typedChar !== char;
+                        const isMissed = isSubmitted && typedChar === undefined;
 
                         if (isCorrect) {
                             className = 'relative text-green-600 dark:text-green-400 font-semibold';
-                        } else if (isError) {
+                        } else if (isError || isMissed) {
                             className = 'relative text-red-600 dark:text-red-400';
                         }
 
@@ -51,14 +58,17 @@ const TypingArea = () => {
                         return (
                             <span key={charIndex} className={className}>
                                 {char}
-                                {showCaret && <Caret style={caretStyle} />}
+                                {showCaret && <Caret style={caretStyle} wpm={wpm} smoothCaret={smoothCaret} className={caretStyle === 'line' ? '-left-[1px]' : ''} />}
                             </span>
                         );
                     })}
-                    {isCurrentWord && typedWord.length > word.length && (
-                        <span className="text-red-500 bg-red-500/20">
+                    {typedWord.length > word.length && (
+                        <span className="text-red-600 dark:text-red-400 opacity-70">
                             {typedWord.slice(word.length)}
                         </span>
+                    )}
+                    {isCurrentWord && typedWord.length >= word.length && (
+                        <Caret style={caretStyle} wpm={wpm} smoothCaret={smoothCaret} className={caretStyle === 'line' ? '-right-[1px]' : ''} />
                     )}
                 </span>
             );
@@ -73,7 +83,10 @@ const TypingArea = () => {
         >
 
             <div className={`p-3 sm:p-4 md:p-6 min-h-[150px] sm:min-h-[200px] ${fontTheme === 'serif' ? 'font-serif' :
-                fontTheme === 'mono' ? 'font-mono' : 'font-sans'
+                fontTheme === 'mono' ? 'font-mono' :
+                    fontTheme === 'merriweather' ? 'font-merriweather' :
+                        fontTheme === 'roboto' ? 'font-roboto' :
+                            fontTheme === 'fira' ? 'font-fira' : 'font-sans'
                 }`}>
 
                 <div className='text-base sm:text-lg md:text-xl leading-relaxed'>
