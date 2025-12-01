@@ -5,6 +5,7 @@ import History from './pages/History'
 import About from './pages/About'
 import ScrollToTop from './components/ScrollToTop'
 import { ThemeProvider } from './components/theme-provider'
+import NotFound from './pages/NotFound'
 
 const App = () => (
   <ThemeProvider>
@@ -15,6 +16,7 @@ const App = () => (
         <Route path="/typing" element={<Typing />} />
         <Route path="/history" element={<History />} />
         <Route path="/about" element={<About />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   </ThemeProvider>

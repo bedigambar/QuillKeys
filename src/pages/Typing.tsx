@@ -7,10 +7,68 @@ import { useShortcutNotifications } from '@/hooks/useShortcutNotifications'
 import { useTypingStore } from '@/store/typing-store'
 import { motion } from 'framer-motion'
 
-const Typing = () => {
+import { useEffect, useState } from 'react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
+const Typing = () => {
   const { notifications, removeNotification, notifyRestart, notifyStart } = useShortcutNotifications();
-  const { zenMode } = useTypingStore();
+  const { zenMode, status, resetTest } = useTypingStore();
+  const [showRefreshDialog, setShowRefreshDialog] = useState(false);
+
+  // Intercept Ctrl+R / Cmd+R to show custom dialog
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'r' && status === 'running') {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        setShowRefreshDialog(true);
+      }
+    };
+
+    // Use capture phase to intercept before browser handles it
+    window.addEventListener('keydown', handleKeyDown, true);
+    return () => window.removeEventListener('keydown', handleKeyDown, true);
+  }, [status]);
+
+  // Detect pull-to-refresh and other refresh attempts
+  useEffect(() => {
+    let touchStartY = 0;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const touchY = e.touches[0].clientY;
+      const touchDiff = touchY - touchStartY;
+
+      // If pulling down at top of page and test is running
+      if (touchDiff > 0 && window.scrollY === 0 && status === 'running') {
+        e.preventDefault();
+        setShowRefreshDialog(true);
+      }
+    };
+
+    if (status === 'running') {
+      document.addEventListener('touchstart', handleTouchStart, { passive: true });
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    }
+
+    return () => {
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [status]);
 
 
   useKeyboardShortcuts({
@@ -87,6 +145,29 @@ const Typing = () => {
         notifications={notifications}
         onRemove={removeNotification}
       />
+
+      <AlertDialog open={showRefreshDialog} onOpenChange={setShowRefreshDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Restart Test?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your current progress will be lost. Are you sure you want to restart the test?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Continue Test</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                resetTest();
+                setShowRefreshDialog(false);
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Restart Test
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
