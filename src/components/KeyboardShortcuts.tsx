@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Keyboard, RotateCcw, Play, Zap } from 'lucide-react';
+import { Keyboard, RotateCcw, Play, Zap, EyeOff } from 'lucide-react';
 import { useTypingStore } from '@/store/typing-store';
 
 interface ShortcutItem {
@@ -14,11 +14,6 @@ const KeyboardShortcuts = () => {
     if (zenMode) return null;
 
     const shortcuts: ShortcutItem[] = [
-        {
-            keys: ['Tab', '+', 'Enter'],
-            description: 'Restart',
-            icon: <RotateCcw className="w-3.5 h-3.5" />
-        },
         {
             keys: ['3x', 'Enter'],
             description: 'Start',
@@ -43,6 +38,11 @@ const KeyboardShortcuts = () => {
             keys: ['Esc'],
             description: 'Reset',
             icon: <RotateCcw className="w-3.5 h-3.5" />
+        },
+        {
+            keys: ['Ctrl', 'Z'],
+            description: 'Zen Mode',
+            icon: <EyeOff className="w-3.5 h-3.5" />
         }
     ];
 

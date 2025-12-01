@@ -8,7 +8,7 @@ interface KeyboardShortcutsHookProps {
 }
 
 export const useKeyboardShortcuts = ({ onRestartTest, onStartTest }: KeyboardShortcutsHookProps = {}) => {
-    const { status, resetTest, startCountdown, setCurrentText, category } = useTypingStore();
+    const { status, resetTest, startCountdown, setCurrentText, category, toggleZenMode } = useTypingStore();
     const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
     const [sequenceKeys, setSequenceKeys] = useState<string[]>([]);
     const [sequenceTimer, setSequenceTimer] = useState<NodeJS.Timeout | null>(null);
@@ -84,12 +84,6 @@ export const useKeyboardShortcuts = ({ onRestartTest, onStartTest }: KeyboardSho
 
             setPressedKeys(prev => new Set([...prev, key]));
 
-            if (key === 'Enter' && pressedKeys.has('Tab')) {
-                event.preventDefault();
-                handleRestartShortcut();
-                return;
-            }
-
             if (key === 'Enter' || key === ' ') {
                 event.preventDefault();
                 addToSequence(key);
@@ -115,6 +109,11 @@ export const useKeyboardShortcuts = ({ onRestartTest, onStartTest }: KeyboardSho
                 startCountdown();
                 onStartTest?.();
             }
+
+            if ((event.ctrlKey || event.metaKey) && key === 'z') {
+                event.preventDefault();
+                toggleZenMode();
+            }
         };
 
         const handleKeyUp = (event: KeyboardEvent) => {
@@ -135,7 +134,7 @@ export const useKeyboardShortcuts = ({ onRestartTest, onStartTest }: KeyboardSho
                 clearTimeout(sequenceTimer);
             }
         };
-    }, [pressedKeys, sequenceKeys, status, category, resetTest, startCountdown, setCurrentText, onRestartTest, onStartTest, sequenceTimer, addToSequence, checkSequenceShortcuts, handleRestartShortcut]);
+    }, [pressedKeys, sequenceKeys, status, category, resetTest, startCountdown, setCurrentText, onRestartTest, onStartTest, sequenceTimer, addToSequence, checkSequenceShortcuts, handleRestartShortcut, toggleZenMode]);
 
     return {
         pressedKeys,
