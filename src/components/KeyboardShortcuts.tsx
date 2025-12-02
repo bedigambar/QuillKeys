@@ -56,7 +56,7 @@ const KeyboardShortcuts = () => {
         >
             <div className="flex items-center gap-1.5 text-muted-foreground group-hover:text-primary transition-colors">
                 {shortcut.icon}
-                <span className="font-medium">{shortcut.description}</span>
+                <span className="font-medium whitespace-nowrap">{shortcut.description}</span>
             </div>
             <div className="flex items-center gap-1">
                 {shortcut.keys.map((key, keyIndex) => (
@@ -92,12 +92,12 @@ const KeyboardShortcuts = () => {
                 {/* Desktop View */}
                 <div className="hidden lg:block">
                     <div className="flex items-center justify-center">
-                        <div className="flex items-center gap-4 px-6 py-3 bg-background/60 backdrop-blur-xl border border-border/40 rounded-2xl shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-black/10 transition-all duration-300 hover:bg-background/70 hover:border-border/60">
-                            <div className="flex items-center gap-2 pr-4 border-r border-border/30 text-sm font-semibold text-primary">
+                        <div className="flex items-center gap-3 px-4 py-2.5 bg-background/60 backdrop-blur-xl border border-border/40 rounded-2xl shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-black/10 transition-all duration-300 hover:bg-background/70 hover:border-border/60">
+                            <div className="flex items-center gap-2 pr-3 border-r border-border/30 text-sm font-semibold text-primary">
                                 <Keyboard className="w-4 h-4" />
                                 <span>Shortcuts</span>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5">
                                 {shortcuts.map((shortcut, index) => renderShortcut(shortcut, index))}
                             </div>
                         </div>
