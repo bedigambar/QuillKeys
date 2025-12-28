@@ -56,7 +56,7 @@ const TypingArea = () => {
 
                     return (
                         <div key={lineIndex} className="flex flex-wrap w-full">
-                            {words.map((word, wordIndex) => {
+                            {words.map((word) => {
                                 if (word === '') return null;
 
                                 const currentWordIndex = globalWordIndex++;
