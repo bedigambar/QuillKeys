@@ -1,4 +1,5 @@
 import { useTypingStore } from '@/store/typing-store';
+import { getContentTypeByCategory } from '@/data/questions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, Legend } from 'recharts';
 import { motion, type Variants } from 'framer-motion';
@@ -25,7 +26,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const HistoryView = () => {
-    const { testResults, clearHistory } = useTypingStore();
+    const { testResults, clearHistory, resetTest } = useTypingStore();
     const navigate = useNavigate();
     const [sortBy, setSortBy] = useState<'date' | 'wpm' | 'accuracy'>('date');
     const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -75,7 +76,6 @@ const HistoryView = () => {
         return new Date(timestamp).toLocaleDateString();
     };
 
-    // Get accuracy badge color
     const getAccuracyColor = (accuracy: number) => {
         if (accuracy >= 95) return 'text-green-500 bg-green-500/10';
         if (accuracy >= 85) return 'text-yellow-500 bg-yellow-500/10';
@@ -113,7 +113,6 @@ const HistoryView = () => {
         }
     ];
 
-    // Animation Variants
     const containerVariants: Variants = {
         hidden: { opacity: 0 },
         visible: {
@@ -156,7 +155,10 @@ const HistoryView = () => {
                             variant="default"
                             size="sm"
                             className="gap-2"
-                            onClick={() => navigate('/typing')}
+                            onClick={() => {
+                                resetTest();
+                                navigate('/typing');
+                            }}
                         >
                             <ArrowLeft className="w-4 h-4" />
                             Back to Test
@@ -417,6 +419,12 @@ const HistoryView = () => {
                                                     <span className="text-sm text-muted-foreground">Category:</span>
                                                     <span className="text-sm font-medium truncate max-w-[140px]">
                                                         {result.category}
+                                                    </span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-sm text-muted-foreground">Type:</span>
+                                                    <span className="text-sm font-medium capitalize">
+                                                        {result.contentType || getContentTypeByCategory(result.category)}
                                                     </span>
                                                 </div>
                                                 <div className="flex justify-between items-center">

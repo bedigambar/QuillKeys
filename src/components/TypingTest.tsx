@@ -3,12 +3,13 @@ import { useTypingStore } from '@/store/typing-store'
 import ControlPanel from './ControlPanel'
 import { motion } from 'framer-motion';
 import TypingArea from './TypingArea';
-import ResultCard from './ResultCard';
 import { useEffect } from 'react';
 import { StatsDisplay } from './Stats';
+import { useNavigate } from 'react-router-dom';
 
 const TypingTest = () => {
   const { status, updateTimer, updateCountdown, addWpmDataPoint, resetTest } = useTypingStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     resetTest();
@@ -34,23 +35,25 @@ const TypingTest = () => {
       }
     };
   }, [status, updateTimer, updateCountdown, addWpmDataPoint]);
+
+  useEffect(() => {
+    if (status === 'completed') {
+      navigate('/results');
+    }
+  }, [status, navigate]);
+
   return (
     <div className='max-w-4xl mx-auto space-y-4 sm:space-y-6 px-2 sm:px-4'>
-
       <ControlPanel />
 
-      {status != 'completed' && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <StatsDisplay />
-          <TypingArea />
-        </motion.div>
-      )}
-
-      {status == 'completed' && <ResultCard />}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <StatsDisplay />
+        <TypingArea />
+      </motion.div>
     </div>
   )
 }

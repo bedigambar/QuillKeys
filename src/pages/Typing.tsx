@@ -92,44 +92,44 @@ const Typing = () => {
                 Test Your Typing Speed
               </h2>
 
-              <p className='text-sm sm:text-base md:text-lg px-2'>
-                Type through the profound works of{' '}
+              <p className='text-sm sm:text-base md:text-lg px-2 max-w-3xl mx-auto leading-relaxed'>
+                From the structured rhymes of{' '}
                 <motion.span
-                  className='font-edu  font-bold'
+                  className='font-edu font-bold'
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.9, delay: 0.2 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
                 >
-                  Kafka
+                  Frost
                 </motion.span>
-                ,{' '}
+                {' '}and{' '}
                 <motion.span
                   className='font-edu font-bold'
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.4 }}
                 >
-                  Dostoevsky
+                  Poe
                 </motion.span>
-                ,{' '}
+                {' '}to the existential depths of{' '}
                 <motion.span
                   className='font-edu font-bold'
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.6 }}
                 >
-                  Camus
+                  Dostoevsky
                 </motion.span>
-                , and{' '}
+                {' '}and{' '}
                 <motion.span
                   className='font-edu font-bold'
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.8 }}
                 >
-                  Gogol
+                  Kafka
                 </motion.span>
-                —where every word weighs upon the soul.
+                . Master the art of typing through literature.
               </p>
             </>
           )}

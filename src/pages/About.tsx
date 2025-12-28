@@ -8,11 +8,15 @@ import kafkaPortrait from '../assets/kafka-portrait.png';
 import dostoevskyPortrait from '../assets/dostoevsky-portrait.png';
 import camusPortrait from '../assets/camus-portrait.png';
 import gogolPortrait from '../assets/gogol-portrait.png';
+import poePortrait from '../assets/edgar-allen-poe-bill-cannon.webp';
+import frostPortrait from '../assets/Robert-Frost-1954.webp';
+import dickinsonPortrait from '../assets/dickinson.avif';
+import whitmanPortrait from '../assets/Whitman.jpg';
 
 const About = () => {
     const navigate = useNavigate();
 
-    const authors = [
+    const proseAuthors = [
         {
             name: "Franz Kafka",
             role: "The Master of the Absurd",
@@ -43,6 +47,37 @@ const About = () => {
         }
     ];
 
+    const poets = [
+        {
+            name: "Edgar Allan Poe",
+            role: "The Master of Macabre",
+            image: poePortrait,
+            bio: "Poe's works are a descent into madness and mystery, exploring the darker corners of the human mind. His rhythmic poetry and atmospheric prose challenge your precision and flow.",
+            quote: "All that we see or seem is but a dream within a dream."
+        },
+        {
+            name: "Robert Frost",
+            role: "The Voice of Nature",
+            image: frostPortrait,
+            bio: "Frost captures the beauty and isolation of rural life with deceptive simplicity. His structured rhymes and blank verse offer a rhythmic, contemplative typing experience.",
+            quote: "In three words I can sum up everything I've learned about life: it goes on."
+        },
+        {
+            name: "Emily Dickinson",
+            role: "The Mystic of Amherst",
+            image: dickinsonPortrait,
+            bio: "Dickinson's concise, enigmatic verses challenge conventional poetic forms. Her exploration of the inner landscape demands careful attention to every dash and capitalization.",
+            quote: "Hope is the thing with feathers that perches in the soul."
+        },
+        {
+            name: "Walt Whitman",
+            role: "The Voice of America",
+            image: whitmanPortrait,
+            bio: "Whitman's sprawling free verse breaks the boundaries of traditional poetry. Typing his work is an exercise in rhythm and breath, mirroring the vastness of the human spirit.",
+            quote: "I celebrate myself, and sing myself."
+        }
+    ];
+
     return (
         <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
             <Header />
@@ -59,8 +94,8 @@ const About = () => {
                         </h1>
                         <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed mb-8 sm:mb-12">
                             QuillKeys isn't just a typing tutor. It's a <span className="text-foreground font-medium">literary immersion tool</span>.
-                            By tracing the words of existential masters, you absorb their rhythm, their vocabulary, and their profound observations on the human condition.
-                            We believe that the act of typing, physically reconstructing these masterpieces, allows for a deeper connection than reading alone.
+                            By tracing the words of existential masters and poetic visionaries, you absorb their rhythm, their vocabulary, and their profound observations on the human condition.
+                            Whether it's the structured stanzas of poetry or the flowing prose of philosophy, we believe that the act of typing allows for a deeper connection than reading alone.
                         </p>
                         <Button
                             size="lg"
@@ -83,38 +118,90 @@ const About = () => {
                         The Masters
                     </motion.h2>
 
-                    <div className="grid md:grid-cols-2 gap-8 sm:gap-12">
-                        {authors.map((author, index) => (
-                            <motion.div
-                                key={author.name}
-                                className="group relative bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 sm:p-8 overflow-hidden hover:border-amber-400/50 hover:shadow-lg hover:shadow-amber-400/10 transition-all duration-300"
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
+                    <div className="grid md:grid-cols-2 gap-8 sm:gap-12 items-start">
+                        <div className="space-y-8 sm:space-y-12">
+                            <motion.h3 
+                                className="text-2xl font-serif text-center mb-6 text-muted-foreground"
+                                initial={{ opacity: 0 }}
+                                whileInView={{ opacity: 1 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: index * 0.1 }}
                             >
-                                <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></div>
-                                <div className="flex flex-col sm:flex-row gap-6 items-start">
-                                    <div className="shrink-0 mx-auto sm:mx-0">
-                                        <img
-                                            src={author.image}
-                                            alt={author.name}
-                                            className="w-24 h-32 sm:w-32 sm:h-40 object-cover rounded-lg shadow-lg rotate-3 group-hover:rotate-0 transition-transform duration-300"
-                                        />
+                                The Prose Masters
+                            </motion.h3>
+                            {proseAuthors.map((author, index) => (
+                                <motion.div
+                                    key={author.name}
+                                    className="group relative bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 sm:p-8 overflow-hidden hover:border-amber-400/50 hover:shadow-lg hover:shadow-amber-400/10 transition-all duration-300"
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: index * 0.1 }}
+                                >
+                                    <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></div>
+                                    <div className="flex flex-col sm:flex-row gap-6 items-start">
+                                        <div className="shrink-0 mx-auto sm:mx-0">
+                                            <img
+                                                src={author.image}
+                                                alt={author.name}
+                                                className="w-24 h-32 sm:w-32 sm:h-40 object-cover rounded-lg shadow-lg rotate-3 group-hover:rotate-0 transition-transform duration-300"
+                                            />
+                                        </div>
+                                        <div className="flex-1 text-center sm:text-left">
+                                            <h3 className="text-2xl font-serif font-bold mb-1">{author.name}</h3>
+                                            <p className="text-primary font-medium mb-3">{author.role}</p>
+                                            <p className="text-muted-foreground mb-4 leading-relaxed text-sm sm:text-base">
+                                                {author.bio}
+                                            </p>
+                                            <blockquote className="border-l-2 border-primary/30 pl-4 italic text-muted-foreground text-sm">
+                                                "{author.quote}"
+                                            </blockquote>
+                                        </div>
                                     </div>
-                                    <div className="flex-1 text-center sm:text-left">
-                                        <h3 className="text-2xl font-serif font-bold mb-1">{author.name}</h3>
-                                        <p className="text-primary font-medium mb-3">{author.role}</p>
-                                        <p className="text-muted-foreground mb-4 leading-relaxed text-sm sm:text-base">
-                                            {author.bio}
-                                        </p>
-                                        <blockquote className="border-l-2 border-primary/30 pl-4 italic text-muted-foreground text-sm">
-                                            "{author.quote}"
-                                        </blockquote>
+                                </motion.div>
+                            ))}
+                        </div>
+
+                        <div className="space-y-8 sm:space-y-12">
+                            <motion.h3 
+                                className="text-2xl font-serif text-center mb-6 text-muted-foreground"
+                                initial={{ opacity: 0 }}
+                                whileInView={{ opacity: 1 }}
+                                viewport={{ once: true }}
+                            >
+                                The Poets
+                            </motion.h3>
+                            {poets.map((author, index) => (
+                                <motion.div
+                                    key={author.name}
+                                    className="group relative bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 sm:p-8 overflow-hidden hover:border-amber-400/50 hover:shadow-lg hover:shadow-amber-400/10 transition-all duration-300"
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: index * 0.1 }}
+                                >
+                                    <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></div>
+                                    <div className="flex flex-col sm:flex-row gap-6 items-start">
+                                        <div className="shrink-0 mx-auto sm:mx-0">
+                                            <img
+                                                src={author.image}
+                                                alt={author.name}
+                                                className="w-24 h-32 sm:w-32 sm:h-40 object-cover rounded-lg shadow-lg rotate-3 group-hover:rotate-0 transition-transform duration-300"
+                                            />
+                                        </div>
+                                        <div className="flex-1 text-center sm:text-left">
+                                            <h3 className="text-2xl font-serif font-bold mb-1">{author.name}</h3>
+                                            <p className="text-primary font-medium mb-3">{author.role}</p>
+                                            <p className="text-muted-foreground mb-4 leading-relaxed text-sm sm:text-base">
+                                                {author.bio}
+                                            </p>
+                                            <blockquote className="border-l-2 border-primary/30 pl-4 italic text-muted-foreground text-sm">
+                                                "{author.quote}"
+                                            </blockquote>
+                                        </div>
                                     </div>
-                                </div>
-                            </motion.div>
-                        ))}
+                                </motion.div>
+                            ))}
+                        </div>
                     </div>
                 </section>
 

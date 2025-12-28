@@ -30,49 +30,80 @@ const TypingArea = () => {
     }, [status]);
 
     const renderText = () => {
-        const words = currentText.split(' ');
+        const lines = currentText.split('\n');
         const typedWords = typedText.split(' ');
+        let globalWordIndex = 0;
 
-        return words.map((word, wordIndex) => {
-            const typedWord = typedWords[wordIndex] || '';
-            const isCurrentWord = wordIndex === typedWords.length - 1;
-            const isSubmitted = wordIndex < typedWords.length - 1;
-
-            return (
-                <span key={wordIndex} className="inline-block mr-2 mb-1 relative">
-                    {word.split('').map((char, charIndex) => {
-                        const typedChar = typedWord[charIndex];
-                        let className = 'relative text-muted-foreground';
-                        const isCorrect = typedChar === char;
-                        const isError = typedChar !== undefined && typedChar !== char;
-                        const isMissed = isSubmitted && typedChar === undefined;
-
-                        if (isCorrect) {
-                            className = 'relative text-green-600 dark:text-green-400 font-semibold';
-                        } else if (isError || isMissed) {
-                            className = 'relative text-red-600 dark:text-red-400';
-                        }
-
-                        const showCaret = isCurrentWord && charIndex === typedWord.length;
-
+        return (
+            <div className="flex flex-col items-start w-full">
+                {lines.map((line, lineIndex) => {
+                    if (line.length === 0) {
+                        const currentWordIndex = globalWordIndex++;
+                        const typedWord = typedWords[currentWordIndex] || '';
+                        
                         return (
-                            <span key={charIndex} className={className}>
-                                {char}
-                                {showCaret && <Caret style={caretStyle} wpm={wpm} smoothCaret={smoothCaret} className={caretStyle === 'line' ? '-left-[1px]' : ''} />}
-                            </span>
+                            <div key={lineIndex} className="h-6 w-full flex">
+                                {typedWord.length > 0 && (
+                                     <span className="text-red-600 dark:text-red-400 opacity-70">
+                                        {typedWord}
+                                    </span>
+                                )}
+                            </div>
                         );
-                    })}
-                    {typedWord.length > word.length && (
-                        <span className="text-red-600 dark:text-red-400 opacity-70">
-                            {typedWord.slice(word.length)}
-                        </span>
-                    )}
-                    {isCurrentWord && typedWord.length >= word.length && (
-                        <Caret style={caretStyle} wpm={wpm} smoothCaret={smoothCaret} className={caretStyle === 'line' ? '-right-[1px]' : ''} />
-                    )}
-                </span>
-            );
-        });
+                    }
+
+                    const words = line.split(' ');
+
+                    return (
+                        <div key={lineIndex} className="flex flex-wrap w-full">
+                            {words.map((word, wordIndex) => {
+                                if (word === '') return null;
+
+                                const currentWordIndex = globalWordIndex++;
+                                const typedWord = typedWords[currentWordIndex] || '';
+                                const isCurrentWord = currentWordIndex === typedWords.length - 1;
+                                const isSubmitted = currentWordIndex < typedWords.length - 1;
+
+                                return (
+                                    <span key={currentWordIndex} className="inline-block mr-2 mb-1 relative">
+                                        {word.split('').map((char, charIndex) => {
+                                            const typedChar = typedWord[charIndex];
+                                            let className = 'relative text-muted-foreground';
+                                            const isCorrect = typedChar === char;
+                                            const isError = typedChar !== undefined && typedChar !== char;
+                                            const isMissed = isSubmitted && typedChar === undefined;
+
+                                            if (isCorrect) {
+                                                className = 'relative text-green-600 dark:text-green-400 font-semibold';
+                                            } else if (isError || isMissed) {
+                                                className = 'relative text-red-600 dark:text-red-400';
+                                            }
+
+                                            const showCaret = isCurrentWord && charIndex === typedWord.length;
+
+                                            return (
+                                                <span key={charIndex} className={className}>
+                                                    {char}
+                                                    {showCaret && <Caret style={caretStyle} wpm={wpm} smoothCaret={smoothCaret} className={caretStyle === 'line' ? '-left-[1px]' : ''} />}
+                                                </span>
+                                            );
+                                        })}
+                                        {typedWord.length > word.length && (
+                                            <span className="text-red-600 dark:text-red-400 opacity-70">
+                                                {typedWord.slice(word.length)}
+                                            </span>
+                                        )}
+                                        {isCurrentWord && typedWord.length >= word.length && (
+                                            <Caret style={caretStyle} wpm={wpm} smoothCaret={smoothCaret} className={caretStyle === 'line' ? '-right-[1px]' : ''} />
+                                        )}
+                                    </span>
+                                );
+                            })}
+                        </div>
+                    );
+                })}
+            </div>
+        );
     };
 
     return (
@@ -98,6 +129,26 @@ const TypingArea = () => {
                     type="text"
                     value={typedText}
                     onChange={(e) => setTypedText(e.target.value)}
+                    onKeyDown={(e) => {
+                        const expectedChar = currentText[typedText.length];
+
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            if (expectedChar === '\n') {
+                                setTypedText(typedText + ' ');
+                            }
+                            return;
+                        }
+
+                        if (e.key === ' ') {
+                            e.preventDefault();
+                            if (expectedChar === ' ' || expectedChar === '\n') {
+                                setTypedText(typedText + ' ');
+                            } else if (expectedChar) {
+                                setTypedText(typedText + '~');
+                            }
+                        }
+                    }}
                     className="absolute inset-0 opacity-0 cursor-default"
                     disabled={status !== 'running'}
                     autoComplete="off"
@@ -111,7 +162,10 @@ const TypingArea = () => {
             {
                 status === 'idle' && (
                     <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-lg">
-                        <p className="text-muted-foreground">Click "Start Test" to begin</p>
+                        <div className="text-center space-y-2">
+                            <p className="text-muted-foreground text-lg">Select your mode and click "Start Test"</p>
+                            <p className="text-sm text-muted-foreground/60">Prose • Poetry • Zen Mode</p>
+                        </div>
                     </div>
                 )
             }

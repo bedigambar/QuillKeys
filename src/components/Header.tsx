@@ -10,9 +10,10 @@ const Header = () => {
     const location = useLocation()
     const isHomePage = location.pathname === '/'
     const isHistoryPage = location.pathname === '/history'
+    const isResultsPage = location.pathname === '/results'
     const { zenMode } = useTypingStore()
 
-    if (zenMode) return null;
+    if (zenMode && !isResultsPage) return null;
 
     return (
         <motion.header

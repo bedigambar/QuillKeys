@@ -6,6 +6,7 @@ export type TestStatus = 'idle' | 'countdown' | 'running' | 'completed';
 export type TimerOption = 30 | 60 | 180 | 'custom';
 export type FontTheme = 'serif' | 'sans' | 'mono' | 'merriweather' | 'roboto' | 'fira';
 export type CaretStyle = 'block' | 'line' | 'underline';
+export type ContentType = 'prose' | 'poetry';
 
 
 
@@ -14,64 +15,26 @@ export interface TestResult {
   accuracy: number;
   timeTaken: number;
   category: string;
+  contentType: ContentType;
   timestamp: number;
 }
 
 export interface WpmDataPoint {
   time: number;
   wpm: number;
+  raw: number;
+  errors: number;
 }
 
-const getWordBasedStats = (currentText: string, typedText: string) => {
-  const words = currentText.split(' ');
-  const typedWords = typedText.split(' ');
-
-  let correctChars = 0;
-  let incorrectChars = 0;
-  let extraChars = 0;
-  let missedChars = 0;
-
-  typedWords.forEach((typedWord, index) => {
-    const targetWord = words[index];
-
-    if (!targetWord) {
-      extraChars += typedWord.length;
-      return;
-    }
-
-    const isLastWord = index === typedWords.length - 1;
-
-    for (let i = 0; i < Math.max(typedWord.length, targetWord.length); i++) {
-      const typedChar = typedWord[i];
-      const targetChar = targetWord[i];
-
-      if (typedChar !== undefined && targetChar !== undefined) {
-        if (typedChar === targetChar) {
-          correctChars++;
-        } else {
-          incorrectChars++;
-        }
-      } else if (typedChar !== undefined && targetChar === undefined) {
-        extraChars++;
-      } else if (typedChar === undefined && targetChar !== undefined) {
-        if (!isLastWord) {
-          missedChars++;
-        }
-      }
-    }
-
-    if (!isLastWord) {
-      correctChars++;
-    }
-  });
-
-  return { correctChars, incorrectChars, extraChars, missedChars };
-};
+export interface KeyErrors {
+  [key: string]: number;
+}
 
 interface TypingState {
 
   timerDuration: TimerOption;
   customTimerDuration: number;
+  contentType: ContentType;
   category: string;
 
 
@@ -88,11 +51,12 @@ interface TypingState {
   testResults: TestResult[];
 
 
-  totalCorrectChars: number;
-  totalTypedChars: number;
   grossTypedChars: number;
-  lastWpmUpdate: number;
-  lastCorrectChars: number;
+  
+  correctChars: number;
+  incorrectChars: number;
+  keyErrors: KeyErrors;
+  rawWpm: number;
 
   fontTheme: FontTheme;
   caretStyle: CaretStyle;
@@ -104,6 +68,7 @@ interface TypingState {
 
   setTimerDuration: (duration: TimerOption) => void;
   setCustomTimerDuration: (duration: number) => void;
+  setContentType: (type: ContentType) => void;
   setCategory: (category: string) => void;
   setCurrentText: (text: string) => void;
   setTypedText: (text: string) => void;
@@ -131,7 +96,8 @@ export const useTypingStore = create<TypingState>()(
 
       timerDuration: 60,
       customTimerDuration: 120,
-      category: 'JavaScript',
+      contentType: 'prose',
+      category: 'Kafka',
       status: 'idle',
       timeLeft: 60,
       countdownTime: 3,
@@ -141,11 +107,11 @@ export const useTypingStore = create<TypingState>()(
       accuracy: 100,
       wpmHistory: [],
       testResults: [],
-      totalCorrectChars: 0,
-      totalTypedChars: 0,
       grossTypedChars: 0,
-      lastWpmUpdate: 0,
-      lastCorrectChars: 0,
+      correctChars: 0,
+      incorrectChars: 0,
+      keyErrors: {},
+      rawWpm: 0,
 
       fontTheme: 'roboto',
       caretStyle: 'line',
@@ -168,12 +134,14 @@ export const useTypingStore = create<TypingState>()(
         }
       },
 
+      setContentType: (type) => set({ contentType: type }),
+
       setCategory: (category) => set({ category }),
 
       setCurrentText: (text) => set({ currentText: text }),
 
       setTypedText: (text) => {
-        const { currentText, status, typedText: oldText, grossTypedChars } = get();
+        const { currentText, status, typedText: oldText, grossTypedChars, keyErrors, correctChars: oldCorrectChars, incorrectChars: oldIncorrectChars } = get();
 
         let newKeystrokes = 0;
         if (text.length > oldText.length) {
@@ -182,16 +150,81 @@ export const useTypingStore = create<TypingState>()(
           newKeystrokes = 1;
         }
 
+        const getExpectedWords = (str: string) => {
+          const words: string[] = [];
+          const lines = str.split('\n');
+          lines.forEach(line => {
+            if (line.length === 0) {
+              words.push('');
+            } else {
+              line.split(' ').forEach(w => {
+                if (w !== '') words.push(w);
+              });
+            }
+          });
+          return words;
+        };
+
+        let newCorrectChars = 0;
+        let newIncorrectChars = 0;
+        const newKeyErrors = { ...keyErrors };
+        const expectedWords = getExpectedWords(currentText);
+        
+        if (text.length > oldText.length) {
+          const newCharsCount = text.length - oldText.length;
+          for (let i = 0; i < newCharsCount; i++) {
+            const charIndex = oldText.length + i;
+            const expectedChar = currentText[charIndex];
+            const typedChar = text[charIndex];
+            
+            // Allow space to match newline for poetry
+            const isMatch = typedChar === expectedChar || (expectedChar === '\n' && typedChar === ' ');
+
+            if (isMatch) {
+              newCorrectChars++;
+            } else {
+              newIncorrectChars++;
+              // Only count as missed if it's a space (word skip), count only 1 char
+              if (typedChar === ' ') {
+                // User pressed space, skipping current character
+                // Calculate which word we just finished
+                const textBefore = text.substring(0, charIndex);
+                const wordIndex = textBefore.split(' ').length - 1;
+
+                if (wordIndex < expectedWords.length) {
+                  const expectedWord = expectedWords[wordIndex];
+                  const actualWord = textBefore.split(' ').pop() || '';
+
+                  if (actualWord.length < expectedWord.length) {
+                    // Add all missed characters to errors
+                    for (let k = actualWord.length; k < expectedWord.length; k++) {
+                      const missedChar = expectedWord[k];
+                      newKeyErrors[missedChar] = (newKeyErrors[missedChar] || 0) + 1;
+                    }
+                  } else if (expectedChar) {
+                    newKeyErrors[expectedChar] = (newKeyErrors[expectedChar] || 0) + 1;
+                  }
+                } else if (expectedChar) {
+                  newKeyErrors[expectedChar] = (newKeyErrors[expectedChar] || 0) + 1;
+                }
+              } else if (expectedChar) {
+                newKeyErrors[expectedChar] = (newKeyErrors[expectedChar] || 0) + 1;
+              }
+            }
+          }
+        }
+
         set({
           typedText: text,
-          grossTypedChars: grossTypedChars + newKeystrokes
+          grossTypedChars: grossTypedChars + newKeystrokes,
+          correctChars: oldCorrectChars + newCorrectChars,
+          incorrectChars: oldIncorrectChars + newIncorrectChars,
+          keyErrors: newKeyErrors
         });
 
         get().calculateStats();
 
-
         if (status === 'running' && text.length >= currentText.length) {
-
           get().loadNewQuestion();
         }
       },
@@ -202,11 +235,11 @@ export const useTypingStore = create<TypingState>()(
           countdownTime: 3,
           typedText: '',
           wpmHistory: [],
-          totalCorrectChars: 0,
-          totalTypedChars: 0,
           grossTypedChars: 0,
-          lastWpmUpdate: 0,
-          lastCorrectChars: 0
+          correctChars: 0,
+          incorrectChars: 0,
+          keyErrors: {},
+          rawWpm: 0
         });
       },
 
@@ -241,7 +274,7 @@ export const useTypingStore = create<TypingState>()(
       },
 
       completeTest: () => {
-        const { wpm, accuracy, timerDuration, customTimerDuration, category, testResults } = get();
+        const { wpm, accuracy, timerDuration, customTimerDuration, category, contentType, testResults } = get();
         const actualDuration = timerDuration === 'custom' ? customTimerDuration : timerDuration;
         const timeTaken = actualDuration - get().timeLeft;
 
@@ -250,6 +283,7 @@ export const useTypingStore = create<TypingState>()(
           accuracy,
           timeTaken,
           category,
+          contentType,
           timestamp: Date.now()
         };
 
@@ -269,78 +303,62 @@ export const useTypingStore = create<TypingState>()(
           wpm: 0,
           accuracy: 100,
           wpmHistory: [],
-          totalCorrectChars: 0,
-          totalTypedChars: 0,
           grossTypedChars: 0,
-          lastWpmUpdate: 0,
-          lastCorrectChars: 0
+          correctChars: 0,
+          incorrectChars: 0,
+          keyErrors: {},
+          rawWpm: 0
         });
       },
 
       calculateStats: () => {
-        const { typedText, currentText, timerDuration, customTimerDuration, timeLeft, totalCorrectChars } = get();
+        const { timerDuration, customTimerDuration, timeLeft, correctChars, incorrectChars, grossTypedChars } = get();
         const actualDuration = timerDuration === 'custom' ? customTimerDuration : timerDuration;
-
-        const { correctChars, incorrectChars, extraChars, missedChars } = getWordBasedStats(currentText, typedText);
-        const cumulativeCorrectChars = totalCorrectChars + correctChars;
-
-        const totalEntries = cumulativeCorrectChars + incorrectChars + extraChars + missedChars;
-        const accuracy = totalEntries > 0 ? Math.round((cumulativeCorrectChars / totalEntries) * 100) : 100;
 
         const timeElapsedSeconds = actualDuration - timeLeft;
         const timeElapsedMinutes = timeElapsedSeconds / 60;
 
-        const minTimeSeconds = 1;
-        let wpm = 0;
+        const netChars = Math.max(0, correctChars - incorrectChars);
+        const wpm = timeElapsedMinutes > 0 ? Math.round((netChars / 5) / timeElapsedMinutes) : 0;
+        
+        const rawWpm = timeElapsedMinutes > 0 ? Math.round((grossTypedChars / 5) / timeElapsedMinutes) : 0;
 
-        if (timeElapsedSeconds >= minTimeSeconds) {
-          const correctWords = cumulativeCorrectChars / 5;
-          wpm = Math.round(correctWords / timeElapsedMinutes);
-        }
+        const totalKeystrokes = correctChars + incorrectChars;
+        const accuracy = totalKeystrokes > 0 ? Math.round((correctChars / totalKeystrokes) * 100) : 100;
 
-        set({ wpm, accuracy });
+        set({ wpm, accuracy, rawWpm });
       },
 
       addWpmDataPoint: () => {
-        const { wpmHistory, timerDuration, customTimerDuration, timeLeft, totalCorrectChars, typedText, currentText, lastCorrectChars, lastWpmUpdate } = get();
+        const { wpmHistory, timerDuration, customTimerDuration, timeLeft, correctChars, incorrectChars, grossTypedChars } = get();
         const actualDuration = timerDuration === 'custom' ? customTimerDuration : timerDuration;
         const timeElapsed = actualDuration - timeLeft;
-        const now = Date.now();
+        const timeElapsedMinutes = timeElapsed / 60;
 
-        const { correctChars } = getWordBasedStats(currentText, typedText);
-        const totalCorrect = totalCorrectChars + correctChars;
-
-        const deltaCorrect = totalCorrect - lastCorrectChars;
-
-        let timeDeltaMinutes = 1 / 60;
-        if (lastWpmUpdate > 0) {
-          const timeDeltaMs = now - lastWpmUpdate;
-          if (timeDeltaMs > 100) {
-            timeDeltaMinutes = timeDeltaMs / 1000 / 60;
-          }
+        if (timeElapsedMinutes > 0) {
+          const netChars = Math.max(0, correctChars - incorrectChars);
+          const wpm = Math.min(Math.round((netChars / 5) / timeElapsedMinutes), 300);
+          
+          const raw = Math.min(Math.round((grossTypedChars / 5) / timeElapsedMinutes), 300);
+          
+          set({
+            wpmHistory: [...wpmHistory, { 
+              time: timeElapsed, 
+              wpm,
+              raw,
+              errors: incorrectChars 
+            }]
+          });
         }
-
-        const instantWpm = Math.max(0, Math.round((deltaCorrect / 5) / timeDeltaMinutes));
-
-        set({
-          wpmHistory: [...wpmHistory, { time: timeElapsed, wpm: instantWpm }],
-          lastCorrectChars: totalCorrect,
-          lastWpmUpdate: now
-        });
       },
 
       loadNewQuestion: () => {
-        const { category, status, typedText, currentText, totalCorrectChars, totalTypedChars } = get();
+        const { category, status } = get();
         if (status === 'running') {
-
-          const { correctChars } = getWordBasedStats(currentText, typedText);
-
           const newQuestion = getRandomQuestion(category);
           set({
             currentText: newQuestion.text,
-            typedText: '',
-            totalCorrectChars: totalCorrectChars + correctChars,
-            totalTypedChars: totalTypedChars + typedText.length
+            typedText: ''
           });
         }
       },
@@ -361,6 +379,7 @@ export const useTypingStore = create<TypingState>()(
       partialize: (state) => ({
         timerDuration: state.timerDuration,
         customTimerDuration: state.customTimerDuration,
+        contentType: state.contentType,
         category: state.category,
         testResults: state.testResults,
         fontTheme: state.fontTheme,

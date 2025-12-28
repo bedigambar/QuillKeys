@@ -89,7 +89,6 @@ const KeyboardShortcuts = () => {
             className="fixed bottom-6 left-0 right-0 z-50 pointer-events-none"
         >
             <div className="container mx-auto px-4 pointer-events-auto">
-                {/* Desktop View */}
                 <div className="hidden lg:block">
                     <div className="flex items-center justify-center">
                         <div className="flex items-center gap-3 px-4 py-2.5 bg-background/60 backdrop-blur-xl border border-border/40 rounded-2xl shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-black/10 transition-all duration-300 hover:bg-background/70 hover:border-border/60">
@@ -104,7 +103,6 @@ const KeyboardShortcuts = () => {
                     </div>
                 </div>
 
-                {/* Tablet View */}
                 <div className="hidden md:block lg:hidden">
                     <div className="flex flex-col items-center gap-2">
                         <div className="flex flex-col gap-2 px-5 py-3 bg-background/60 backdrop-blur-xl border border-border/40 rounded-2xl shadow-lg">

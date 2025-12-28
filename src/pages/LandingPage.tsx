@@ -8,6 +8,8 @@ import kafkaPortrait from '../assets/kafka-portrait.png';
 import dostoevskyPortrait from '../assets/dostoevsky-portrait.png';
 import camusPortrait from '../assets/camus-portrait.png';
 import gogolPortrait from '../assets/gogol-portrait.png';
+import poePortrait from '../assets/edgar-allen-poe-bill-cannon.webp';
+import frostPortrait from '../assets/Robert-Frost-1954.webp';
 import { BookOpen } from 'lucide-react';
 
 
@@ -22,19 +24,19 @@ const LandingPage = () => {
       image: kafkaPortrait
     },
     {
+      text: "Two roads diverged in a wood, and I—I took the one less traveled by, and that has made all the difference.",
+      author: "Robert Frost",
+      image: frostPortrait
+    },
+    {
+      text: "All that we see or seem is but a dream within a dream.",
+      author: "Edgar Allan Poe",
+      image: poePortrait
+    },
+    {
       text: "The mystery of human existence lies not in just staying alive, but in finding something to live for.",
       author: "Fyodor Dostoevsky",
       image: dostoevskyPortrait
-    },
-    {
-      text: "In the depth of winter, I finally learned that within me there lay an invincible summer.",
-      author: "Albert Camus",
-      image: camusPortrait
-    },
-    {
-      text: "The longer and more carefully we look at a funny story, the sadder it becomes.",
-      author: "Nikolai Gogol",
-      image: gogolPortrait
     }
   ];
 
@@ -46,20 +48,20 @@ const LandingPage = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-transparent" />
 
         <motion.div
-          className="relative z-10 text-center max-w-4xl mx-auto -mt-32 sm:mt-0"
+          className="relative z-10 text-center max-w-4xl mx-auto mt-12 sm:mt-0"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <motion.h1
-            className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-mono font-bold mb-6 sm:mb-8 leading-tight px-2"
+            className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-mono font-bold mb-8 sm:mb-8 leading-snug px-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             Type Through the Minds of
             <motion.span
-              className="block mt-2 sm:mt-4 font-edu font-medium"
+              className="block mt-3 sm:mt-4 font-edu font-medium"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
@@ -69,19 +71,19 @@ const LandingPage = () => {
           </motion.h1>
 
           <motion.p
-            className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground/80 mb-8 sm:mb-12 max-w-2xl mx-auto leading-relaxed px-4"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground/80 mb-10 sm:mb-12 max-w-2xl mx-auto leading-relaxed px-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            Type through authentic passages from Kafka, Dostoevsky, Camus, and Gogol, where every word carries philosophical weight.
+            Experience the contrast between poetic rhythm and prose narrative. Authentic passages from the masters, waiting for your keystrokes.
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.8 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-32 sm:mb-0"
           >
             <Button
               variant="default"
@@ -104,7 +106,7 @@ const LandingPage = () => {
         </motion.div>
 
         <motion.div
-          className="absolute left-2 sm:left-4 md:left-8 top-1/4 opacity-20"
+          className="absolute left-0 sm:left-8 md:left-2 lg:left-4 xl:left-8 2xl:left-12 top-[25%] md:top-[15%] opacity-20"
           initial={{ opacity: 0, x: -50, rotate: -12 }}
           animate={{ opacity: 0.2, x: 0, rotate: -12 }}
           transition={{ duration: 1, delay: 1 }}
@@ -112,51 +114,77 @@ const LandingPage = () => {
           <img
             src={kafkaPortrait}
             alt="Franz Kafka"
-            className="w-16 h-20 sm:w-24 sm:h-32 md:w-32 md:h-40 lg:w-40 lg:h-52 object-cover rounded-lg shadow-deep transform -rotate-12"
+            className="w-20 h-28 sm:w-24 sm:h-32 md:w-20 md:h-28 lg:w-24 lg:h-32 xl:w-32 xl:h-40 2xl:w-40 2xl:h-52 object-cover rounded-lg shadow-deep transform -rotate-12"
           />
         </motion.div>
 
         <motion.div
-          className="absolute left-2 sm:left-4 md:left-8 bottom-1/4 opacity-20"
+          className="absolute left-0 sm:left-8 md:left-2 lg:left-4 xl:left-8 2xl:left-12 top-[50%] md:top-[50%] -translate-y-1/2 opacity-20"
+          initial={{ opacity: 0, x: -50, rotate: 8 }}
+          animate={{ opacity: 0.2, x: 0, rotate: 8 }}
+          transition={{ duration: 1, delay: 1.4 }}
+        >
+          <img
+            src={camusPortrait}
+            alt="Albert Camus"
+            className="w-20 h-28 sm:w-24 sm:h-32 md:w-20 md:h-28 lg:w-24 lg:h-32 xl:w-32 xl:h-40 2xl:w-40 2xl:h-52 object-cover rounded-lg shadow-deep transform rotate-8"
+          />
+        </motion.div>
+
+        <motion.div
+          className="absolute left-0 sm:left-8 md:left-2 lg:left-4 xl:left-8 2xl:left-12 top-[58%] md:top-auto md:bottom-[15%] bottom-auto opacity-20"
           initial={{ opacity: 0, x: -50, rotate: -6 }}
           animate={{ opacity: 0.2, x: 0, rotate: -6 }}
           transition={{ duration: 1, delay: 1.2 }}
         >
           <img
-            src={camusPortrait}
-            alt="Albert Camus"
-            className="w-16 h-20 sm:w-24 sm:h-32 md:w-32 md:h-40 lg:w-40 lg:h-52 object-cover rounded-lg shadow-deep transform -rotate-6"
+            src={poePortrait}
+            alt="Edgar Allan Poe"
+            className="w-20 h-28 sm:w-24 sm:h-32 md:w-20 md:h-28 lg:w-24 lg:h-32 xl:w-32 xl:h-40 2xl:w-40 2xl:h-52 object-cover rounded-lg shadow-deep transform -rotate-6"
           />
         </motion.div>
 
         <motion.div
-          className="absolute right-2 sm:right-4 md:right-8 top-1/4 opacity-20"
+          className="absolute right-0 sm:right-8 md:right-2 lg:right-4 xl:right-8 2xl:right-12 top-[25%] md:top-[15%] opacity-20"
           initial={{ opacity: 0, x: 50, rotate: 12 }}
           animate={{ opacity: 0.2, x: 0, rotate: 12 }}
           transition={{ duration: 1, delay: 1.1 }}
         >
           <img
-            src={dostoevskyPortrait}
-            alt="Fyodor Dostoevsky"
-            className="w-16 h-20 sm:w-24 sm:h-32 md:w-32 md:h-40 lg:w-40 lg:h-52 object-cover rounded-lg shadow-deep transform rotate-12"
+            src={frostPortrait}
+            alt="Robert Frost"
+            className="w-20 h-28 sm:w-24 sm:h-32 md:w-20 md:h-28 lg:w-24 lg:h-32 xl:w-32 xl:h-40 2xl:w-40 2xl:h-52 object-cover rounded-lg shadow-deep transform rotate-12"
           />
         </motion.div>
 
         <motion.div
-          className="absolute right-2 sm:right-4 md:right-8 bottom-1/4 opacity-20"
+          className="absolute right-0 sm:right-8 md:right-2 lg:right-4 xl:right-8 2xl:right-12 top-[50%] md:top-[50%] -translate-y-1/2 opacity-20"
+          initial={{ opacity: 0, x: 50, rotate: -8 }}
+          animate={{ opacity: 0.2, x: 0, rotate: -8 }}
+          transition={{ duration: 1, delay: 1.5 }}
+        >
+          <img
+            src={gogolPortrait}
+            alt="Nikolai Gogol"
+            className="w-20 h-28 sm:w-24 sm:h-32 md:w-20 md:h-28 lg:w-24 lg:h-32 xl:w-32 xl:h-40 2xl:w-40 2xl:h-52 object-cover rounded-lg shadow-deep transform -rotate-8"
+          />
+        </motion.div>
+
+        <motion.div
+          className="absolute right-0 sm:right-8 md:right-2 lg:right-4 xl:right-8 2xl:right-12 top-[58%] md:top-auto md:bottom-[15%] bottom-auto opacity-20"
           initial={{ opacity: 0, x: 50, rotate: 6 }}
           animate={{ opacity: 0.2, x: 0, rotate: 6 }}
           transition={{ duration: 1, delay: 1.3 }}
         >
           <img
-            src={gogolPortrait}
-            alt="Nikolai Gogol"
-            className="w-16 h-20 sm:w-24 sm:h-32 md:w-32 md:h-40 lg:w-40 lg:h-52 object-cover rounded-lg shadow-deep transform rotate-6"
+            src={dostoevskyPortrait}
+            alt="Fyodor Dostoevsky"
+            className="w-20 h-28 sm:w-24 sm:h-32 md:w-20 md:h-28 lg:w-24 lg:h-32 xl:w-32 xl:h-40 2xl:w-40 2xl:h-52 object-cover rounded-lg shadow-deep transform rotate-6"
           />
         </motion.div>
       </section>
 
-      <section className="-mt-20 sm:mt-0 sm:py-8 md:py-12 lg:py-16 xl:py-24 px-4 sm:px-6 pb-4">
+      <section className="-mt-12 sm:mt-0 sm:py-8 md:pt-12 md:pb-6 lg:pt-16 lg:pb-8 xl:pt-24 xl:pb-12 px-4 sm:px-6 pb-4">
         <div className="max-w-6xl mx-auto">
           <motion.h2
             className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-center mb-3 sm:mb-6 md:mb-8 lg:mb-12"
@@ -201,6 +229,16 @@ const LandingPage = () => {
               </motion.div>
             ))}
           </div>
+
+          <motion.p
+            className="text-center text-gray-700 dark:text-muted-foreground mt-6 sm:mt-8 font-serif italic text-base sm:text-lg"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.8 }}
+          >
+            ...and many more literary giants waiting to be discovered.
+          </motion.p>
         </div>
       </section>
 

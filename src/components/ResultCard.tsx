@@ -9,7 +9,7 @@ import { toPng } from 'html-to-image';
 import { useNavigate } from 'react-router-dom';
 
 const ResultCard = () => {
-  const { wpm, accuracy, timerDuration, timeLeft, wpmHistory, category } = useTypingStore();
+  const { wpm, accuracy, timerDuration, timeLeft, wpmHistory, category, contentType } = useTypingStore();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -103,10 +103,45 @@ const ResultCard = () => {
   ];
 
   const chartLineColor = '#3b82f6';
+  const chartRawColor = '#9ca3af';
+  const chartErrorColor = '#ef4444';
   const chartAxisColor = isDarkMode ? '#aaa' : '#555';
   const chartGridColor = isDarkMode ? '#333' : '#ccc';
-  const tooltipBgColor = isDarkMode ? '#222' : 'white';
+  const tooltipBgColor = isDarkMode ? '#18181b' : 'white';
   const tooltipTextColor = isDarkMode ? 'white' : 'black';
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="p-3 rounded-lg border shadow-lg backdrop-blur-sm" style={{
+          backgroundColor: tooltipBgColor,
+          borderColor: chartGridColor,
+          color: tooltipTextColor
+        }}>
+          <p className="text-sm font-medium mb-2 opacity-70">{`Time: ${label}s`}</p>
+          <div className="space-y-1 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: chartLineColor }} />
+              <span className="font-semibold">WPM:</span>
+              <span>{data.wpm}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: chartRawColor }} />
+              <span className="font-semibold">Raw:</span>
+              <span>{data.raw}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: chartErrorColor }} />
+              <span className="font-semibold">Errors:</span>
+              <span>{data.errors}</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <motion.div
@@ -129,7 +164,7 @@ const ResultCard = () => {
             Test Results
           </CardTitle>
           <div className="text-center text-sm sm:text-base text-muted-foreground mt-1">
-            Author: <span className="font-semibold text-primary">{category}</span>
+            <span className="capitalize">{contentType}</span> by <span className="font-semibold text-primary">{category}</span>
           </div>
         </CardHeader>
         <CardContent className="space-y-4 sm:space-y-6">
@@ -207,25 +242,37 @@ const ResultCard = () => {
                       stroke={chartAxisColor}
                       label={{ value: 'WPM', angle: -90, position: 'insideLeft', fill: chartAxisColor }}
                     />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: tooltipBgColor,
-                        border: `1px solid ${chartGridColor}`,
-                        borderRadius: '8px',
-                        color: tooltipTextColor
-                      }}
-                      labelStyle={{ color: tooltipTextColor }}
-                      itemStyle={{ color: tooltipTextColor }}
-                    />
+                    <Tooltip content={<CustomTooltip />} />
                     <Line
                       type="monotone"
                       dataKey="wpm"
                       stroke={chartLineColor}
                       strokeWidth={3}
                       dot={{ fill: chartLineColor, strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6, strokeWidth: 0 }}
                       fill="url(#colorWpm)"
                       animationDuration={1500}
                       animationEasing="ease-in-out"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="raw"
+                      stroke={chartRawColor}
+                      strokeWidth={2}
+                      strokeOpacity={0}
+                      dot={false}
+                      activeDot={{ r: 4, fill: chartRawColor, strokeWidth: 0 }}
+                      animationDuration={1500}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="errors"
+                      stroke={chartErrorColor}
+                      strokeWidth={2}
+                      strokeOpacity={0}
+                      dot={false}
+                      activeDot={{ r: 4, fill: chartErrorColor, strokeWidth: 0 }}
+                      animationDuration={1500}
                     />
                   </LineChart>
                 </ResponsiveContainer>

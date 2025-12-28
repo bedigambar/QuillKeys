@@ -5,7 +5,6 @@ const Footer = () => {
         <footer className="py-12 px-6 border-t border-border/30">
             <div className="max-w-4xl mx-auto">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                    {/* Quote Section */}
                     <div className="text-center md:text-left flex-1">
                         <p className="text-muted-foreground">
                             "There is no greater agony than bearing an untold story inside you."
@@ -15,7 +14,6 @@ const Footer = () => {
                         </cite>
                     </div>
 
-                    {/* Social Media Links */}
                     <div className="flex items-center gap-4">
                         <a
                             href="https://github.com/bedigambar"

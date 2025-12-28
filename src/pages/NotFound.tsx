@@ -13,7 +13,6 @@ const NotFound = () => {
       <Header />
 
       <main className="flex-grow flex items-center justify-center px-4 sm:px-6 py-12 relative overflow-hidden">
-        {/* Background ambient effects */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-transparent pointer-events-none" />
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl -z-10" />
