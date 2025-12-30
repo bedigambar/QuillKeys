@@ -95,8 +95,8 @@ const ControlPanel = () => {
                 )}
             </div>
 
-            <div className='flex flex-col lg:flex-row items-center lg:items-end justify-center gap-6 pt-4'>
-                <div className='grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-4 w-full lg:w-auto'>
+            <div className='flex flex-col lg:flex-row items-center lg:items-end justify-center gap-4 lg:gap-4 pt-4'>
+                <div className='grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-4 lg:gap-4 w-full lg:w-auto'>
                     <div className='flex flex-col gap-1.5 w-full sm:w-auto'>
                         <div className='text-xs font-medium text-gray-700 dark:text-gray-300 ml-1'>Type</div>
                         <Select
@@ -160,9 +160,9 @@ const ControlPanel = () => {
                     <div className='flex flex-col gap-1.5 w-full sm:w-auto'>
                         <div className='text-xs font-medium text-gray-700 dark:text-gray-300 ml-1'>Caret</div>
                         <Select value={caretStyle} onValueChange={(v) => setCaretStyle(v as any)}>
-                            <SelectTrigger className="w-full sm:w-[120px]">
-                                <div className="flex items-center gap-2">
-                                    <MousePointer2 className="w-4 h-4" />
+                            <SelectTrigger className="w-full sm:w-[130px]">
+                                <div className="flex items-center gap-2 overflow-hidden">
+                                    <MousePointer2 className="w-4 h-4 shrink-0" />
                                     <SelectValue placeholder="Caret" />
                                 </div>
                             </SelectTrigger>
@@ -175,7 +175,7 @@ const ControlPanel = () => {
                     </div>
                 </div>
 
-                <div className='flex gap-2 sm:gap-3 items-center justify-center pb-0.5 w-full sm:w-auto'>
+                <div className='flex gap-2 sm:gap-3 items-end justify-center pb-0.5 w-full lg:w-auto'>
                     <Button
                         variant={zenMode ? "secondary" : "ghost"}
                         onClick={toggleZenMode}

@@ -131,3 +131,21 @@
   }
 }
 
+@keyframes caret-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes caret-blink-block {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.1; }
+}
+
+.caret-blink {
+  animation: caret-blink 1s ease-in-out infinite;
+}
+
+.caret-blink-block {
+  animation: caret-blink-block 1s ease-in-out infinite;
+}
+

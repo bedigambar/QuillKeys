@@ -3,25 +3,31 @@ import { motion } from 'framer-motion';
 import { useTypingStore } from '@/store/typing-store';
 import CapsLockWarning from './CapsLockWarning';
 
-const Caret = ({ style, className = '', wpm, smoothCaret }: { style: string, className?: string, wpm: number, smoothCaret: boolean }) => {
-    const stiffness = Math.min(2500, 500 + (wpm * 15));
-    const damping = Math.min(100, 30 + (wpm * 0.5));
-
+const Caret = ({ style, className = '', smoothCaret }: { style: string, className?: string, smoothCaret: boolean }) => {
     return (
         <motion.span
             layoutId="caret"
-            transition={smoothCaret ? { type: "spring", stiffness, damping } : { duration: 0 }}
-            className={`absolute pointer-events-none z-10 ${style === 'block' ? 'inset-0 bg-primary/30 animate-pulse' :
-                style === 'line' ? 'top-0 bottom-0 w-[2px] bg-primary animate-pulse' :
-                    'left-0 right-0 bottom-0 h-[2px] bg-primary animate-pulse'
-                } ${className}`}
+            layout
+            transition={smoothCaret ? { 
+                type: "spring", 
+                stiffness: 800, 
+                damping: 50,
+                mass: 0.5
+            } : { duration: 0 }}
+            className={`absolute pointer-events-none z-10 ${
+                style === 'block' 
+                    ? 'inset-0 bg-primary/40 caret-blink-block' 
+                    : style === 'line' 
+                        ? 'top-0 bottom-0 w-[2px] bg-primary caret-blink rounded-full' 
+                        : 'left-0 right-0 bottom-0 h-[2px] bg-primary caret-blink rounded-full'
+            } ${className}`}
         />
     );
 };
 
 const TypingArea = () => {
 
-    const { currentText, typedText, setTypedText, status, countdownTime, fontTheme, caretStyle, wpm, smoothCaret, focusMode } = useTypingStore();
+    const { currentText, typedText, setTypedText, status, countdownTime, fontTheme, caretStyle, smoothCaret, focusMode } = useTypingStore();
     const inputRef = useRef<HTMLInputElement>(null);
     const [capsLockOn, setCapsLockOn] = useState(false);
 
@@ -113,7 +119,7 @@ const TypingArea = () => {
                                             return (
                                                 <span key={charIndex} className={className}>
                                                     {char}
-                                                    {showCaret && <Caret style={caretStyle} wpm={wpm} smoothCaret={smoothCaret} className={caretStyle === 'line' ? '-left-[1px]' : ''} />}
+                                                    {showCaret && <Caret style={caretStyle} smoothCaret={smoothCaret} className={caretStyle === 'line' ? '-left-[1px]' : ''} />}
                                                 </span>
                                             );
                                         })}
@@ -123,7 +129,7 @@ const TypingArea = () => {
                                             </span>
                                         )}
                                         {isCurrentWord && typedWord.length >= word.length && (
-                                            <Caret style={caretStyle} wpm={wpm} smoothCaret={smoothCaret} className={caretStyle === 'line' ? '-right-[1px]' : ''} />
+                                            <Caret style={caretStyle} smoothCaret={smoothCaret} className={caretStyle === 'line' ? '-right-[1px]' : ''} />
                                         )}
                                     </span>
                                 );
