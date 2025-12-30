@@ -8,8 +8,6 @@ export type FontTheme = 'serif' | 'sans' | 'mono' | 'merriweather' | 'roboto' | 
 export type CaretStyle = 'block' | 'line' | 'underline';
 export type ContentType = 'prose' | 'poetry';
 
-
-
 export interface TestResult {
   wpm: number;
   accuracy: number;
@@ -24,6 +22,7 @@ export interface WpmDataPoint {
   wpm: number;
   raw: number;
   errors: number;
+  totalErrors?: number;
 }
 
 export interface KeyErrors {
@@ -31,28 +30,20 @@ export interface KeyErrors {
 }
 
 interface TypingState {
-
   timerDuration: TimerOption;
   customTimerDuration: number;
   contentType: ContentType;
   category: string;
-
-
   status: TestStatus;
   timeLeft: number;
   countdownTime: number;
   currentText: string;
   typedText: string;
-
-
   wpm: number;
   accuracy: number;
   wpmHistory: WpmDataPoint[];
   testResults: TestResult[];
-
-
   grossTypedChars: number;
-  
   correctChars: number;
   incorrectChars: number;
   keyErrors: KeyErrors;
@@ -62,9 +53,7 @@ interface TypingState {
   caretStyle: CaretStyle;
   zenMode: boolean;
   smoothCaret: boolean;
-
-
-
+  focusMode: boolean;
 
   setTimerDuration: (duration: TimerOption) => void;
   setCustomTimerDuration: (duration: number) => void;
@@ -86,6 +75,7 @@ interface TypingState {
   setCaretStyle: (style: CaretStyle) => void;
   toggleZenMode: () => void;
   toggleSmoothCaret: () => void;
+  toggleFocusMode: () => void;
 
   clearHistory: () => void;
 }
@@ -93,7 +83,6 @@ interface TypingState {
 export const useTypingStore = create<TypingState>()(
   persist(
     (set, get) => ({
-
       timerDuration: 60,
       customTimerDuration: 120,
       contentType: 'prose',
@@ -117,8 +106,7 @@ export const useTypingStore = create<TypingState>()(
       caretStyle: 'line',
       zenMode: false,
       smoothCaret: false,
-
-
+      focusMode: false,
 
       setTimerDuration: (duration) => {
         const { customTimerDuration } = get();
@@ -341,12 +329,17 @@ export const useTypingStore = create<TypingState>()(
           
           const raw = Math.min(Math.round((grossTypedChars / 5) / timeElapsedMinutes), 300);
           
+          // Calculate NEW errors since last data point
+          const prevTotalErrors = wpmHistory.length > 0 ? wpmHistory[wpmHistory.length - 1].totalErrors || 0 : 0;
+          const newErrors = incorrectChars - prevTotalErrors;
+          
           set({
             wpmHistory: [...wpmHistory, { 
               time: timeElapsed, 
               wpm,
               raw,
-              errors: incorrectChars 
+              errors: newErrors,  // NEW errors in this second only
+              totalErrors: incorrectChars  // Track cumulative for next calculation
             }]
           });
         }
@@ -367,8 +360,7 @@ export const useTypingStore = create<TypingState>()(
       setCaretStyle: (style) => set({ caretStyle: style }),
       toggleZenMode: () => set((state) => ({ zenMode: !state.zenMode })),
       toggleSmoothCaret: () => set((state) => ({ smoothCaret: !state.smoothCaret })),
-
-
+      toggleFocusMode: () => set((state) => ({ focusMode: !state.focusMode })),
 
       clearHistory: () => {
         set({ testResults: [] });
@@ -384,7 +376,8 @@ export const useTypingStore = create<TypingState>()(
         testResults: state.testResults,
         fontTheme: state.fontTheme,
         caretStyle: state.caretStyle,
-        smoothCaret: state.smoothCaret
+        smoothCaret: state.smoothCaret,
+        focusMode: state.focusMode
       })
     }
   )

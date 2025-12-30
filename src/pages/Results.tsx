@@ -4,6 +4,7 @@ import { useTypingStore } from '@/store/typing-store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
+import KeyboardHeatmap from '@/components/KeyboardHeatmap';
 import { 
   Line, 
   XAxis, 
@@ -322,6 +323,14 @@ const Results = () => {
               </motion.div>
             )}
           </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.65 }}
+          >
+            <KeyboardHeatmap keyErrors={keyErrors} />
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0 }}

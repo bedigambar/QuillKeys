@@ -5,7 +5,7 @@ import { TabsList } from '@radix-ui/react-tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Button } from './ui/button';
 
-import { Play, RotateCcw, Clock, Type, MousePointer2, EyeOff, BookOpen } from 'lucide-react';
+import { Play, RotateCcw, Clock, Type, MousePointer2, EyeOff, BookOpen, Focus } from 'lucide-react';
 import { getRandomQuestion, getCategoriesByContentType } from '@/data/questions';
 import { useState, useEffect } from 'react';
 
@@ -13,7 +13,7 @@ const ControlPanel = () => {
     const { timerDuration, setTimerDuration, category, startCountdown, setCategory, status, resetTest,
         setCurrentText, customTimerDuration, setCustomTimerDuration,
         fontTheme, setFontTheme, caretStyle, setCaretStyle, zenMode, toggleZenMode,
-        contentType, setContentType
+        contentType, setContentType, focusMode, toggleFocusMode
     } = useTypingStore();
 
     const [customInput, setCustomInput] = useState(customTimerDuration.toString());
@@ -175,7 +175,7 @@ const ControlPanel = () => {
                     </div>
                 </div>
 
-                <div className='flex gap-3 items-end pb-0.5 w-full sm:w-auto justify-between sm:justify-center'>
+                <div className='flex gap-2 sm:gap-3 items-center justify-center pb-0.5 w-full sm:w-auto'>
                     <Button
                         variant={zenMode ? "secondary" : "ghost"}
                         onClick={toggleZenMode}
@@ -185,16 +185,26 @@ const ControlPanel = () => {
                         <EyeOff className="w-4 h-4" />
                     </Button>
 
+                    <Button
+                        variant={focusMode ? "secondary" : "ghost"}
+                        onClick={toggleFocusMode}
+                        className="h-10 w-10 p-0"
+                        title="Focus Mode - Blur upcoming text"
+                    >
+                        <Focus className="w-4 h-4" />
+                    </Button>
+
                     {status == 'idle' && (
-                        <Button onClick={handleStart} className='h-10 px-6'>
-                            <Play className='w-4 h-4 mr-2' />
-                            Start Test
+                        <Button onClick={handleStart} className='h-10 px-4 sm:px-6'>
+                            <Play className='w-4 h-4 mr-1 sm:mr-2' />
+                            <span className="hidden sm:inline">Start Test</span>
+                            <span className="sm:hidden">Start</span>
                         </Button>
                     )}
 
                     {(status == 'running' || status == 'completed' || status == 'countdown') && (
-                        <Button onClick={resetTest} variant="outline" className="h-10 px-6">
-                            <RotateCcw className="h-4 w-4 mr-2" />
+                        <Button onClick={resetTest} variant="outline" className="h-10 px-4 sm:px-6">
+                            <RotateCcw className="h-4 w-4 mr-1 sm:mr-2" />
                             Reset
                         </Button>
                     )}

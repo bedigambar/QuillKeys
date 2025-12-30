@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTypingStore } from '@/store/typing-store';
+import CapsLockWarning from './CapsLockWarning';
 
 const Caret = ({ style, className = '', wpm, smoothCaret }: { style: string, className?: string, wpm: number, smoothCaret: boolean }) => {
     const stiffness = Math.min(2500, 500 + (wpm * 15));
@@ -20,8 +21,23 @@ const Caret = ({ style, className = '', wpm, smoothCaret }: { style: string, cla
 
 const TypingArea = () => {
 
-    const { currentText, typedText, setTypedText, status, countdownTime, fontTheme, caretStyle, wpm, smoothCaret } = useTypingStore();
+    const { currentText, typedText, setTypedText, status, countdownTime, fontTheme, caretStyle, wpm, smoothCaret, focusMode } = useTypingStore();
     const inputRef = useRef<HTMLInputElement>(null);
+    const [capsLockOn, setCapsLockOn] = useState(false);
+
+    useEffect(() => {
+        const handleKeyEvent = (e: KeyboardEvent) => {
+            setCapsLockOn(e.getModifierState('CapsLock'));
+        };
+
+        window.addEventListener('keydown', handleKeyEvent);
+        window.addEventListener('keyup', handleKeyEvent);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyEvent);
+            window.removeEventListener('keyup', handleKeyEvent);
+        };
+    }, []);
 
     useEffect(() => {
         if (status === 'running' && inputRef.current) {
@@ -33,6 +49,17 @@ const TypingArea = () => {
         const lines = currentText.split('\n');
         const typedWords = typedText.split(' ');
         let globalWordIndex = 0;
+        const currentWordPosition = typedWords.length - 1;
+
+        const getBlurClass = (wordIndex: number) => {
+            if (!focusMode || status !== 'running') return '';
+            const distance = wordIndex - currentWordPosition;
+            if (distance <= 0) return '';
+            if (distance <= 2) return '';
+            if (distance <= 5) return 'blur-[1px] opacity-70';
+            if (distance <= 10) return 'blur-[2px] opacity-50';
+            return 'blur-[3px] opacity-30';
+        };
 
         return (
             <div className="flex flex-col items-start w-full">
@@ -40,9 +67,10 @@ const TypingArea = () => {
                     if (line.length === 0) {
                         const currentWordIndex = globalWordIndex++;
                         const typedWord = typedWords[currentWordIndex] || '';
+                        const blurClass = getBlurClass(currentWordIndex);
                         
                         return (
-                            <div key={lineIndex} className="h-6 w-full flex">
+                            <div key={lineIndex} className={`h-6 w-full flex transition-all duration-200 ${blurClass}`}>
                                 {typedWord.length > 0 && (
                                      <span className="text-red-600 dark:text-red-400 opacity-70">
                                         {typedWord}
@@ -63,9 +91,10 @@ const TypingArea = () => {
                                 const typedWord = typedWords[currentWordIndex] || '';
                                 const isCurrentWord = currentWordIndex === typedWords.length - 1;
                                 const isSubmitted = currentWordIndex < typedWords.length - 1;
+                                const blurClass = getBlurClass(currentWordIndex);
 
                                 return (
-                                    <span key={currentWordIndex} className="inline-block mr-2 mb-1 relative">
+                                    <span key={currentWordIndex} className={`inline-block mr-2 mb-1 relative transition-all duration-200 ${blurClass}`}>
                                         {word.split('').map((char, charIndex) => {
                                             const typedChar = typedWord[charIndex];
                                             let className = 'relative text-muted-foreground';
@@ -112,6 +141,7 @@ const TypingArea = () => {
             animate={{ opacity: 1, y: 0 }}
             className="relative"
         >
+            <CapsLockWarning isVisible={capsLockOn && status === 'running'} />
 
             <div className={`p-3 sm:p-4 md:p-6 min-h-[150px] sm:min-h-[200px] ${fontTheme === 'serif' ? 'font-serif' :
                 fontTheme === 'mono' ? 'font-mono' :

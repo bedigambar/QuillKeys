@@ -4,6 +4,7 @@ import { ModeToggle } from './mode-toggle'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Button } from './ui/button'
 import { useTypingStore } from '@/store/typing-store'
+import { useEffect, useState } from 'react'
 
 const Header = () => {
     const navigate = useNavigate()
@@ -13,11 +14,22 @@ const Header = () => {
     const isResultsPage = location.pathname === '/results'
     const { zenMode } = useTypingStore()
 
+    const [hasAnimated, setHasAnimated] = useState(() => {
+        return sessionStorage.getItem('headerAnimated') === 'true'
+    })
+
+    useEffect(() => {
+        if (!hasAnimated) {
+            sessionStorage.setItem('headerAnimated', 'true')
+            setHasAnimated(true)
+        }
+    }, [hasAnimated])
+
     if (zenMode && !isResultsPage) return null;
 
     return (
         <motion.header
-            initial={{ opacity: 0, y: -20 }}
+            initial={hasAnimated ? false : { opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60"

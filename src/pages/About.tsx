@@ -79,9 +79,10 @@ const About = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+        <div className="min-h-screen bg-background text-foreground">
             <Header />
 
+            <div className="overflow-x-hidden">
             <main className="container mx-auto px-4 py-12 sm:py-20">
                 <section className="max-w-4xl mx-auto text-center mb-20 sm:mb-32">
                     <motion.div
@@ -225,6 +226,7 @@ const About = () => {
                 </section>
             </main>
             <Footer />
+            </div>
         </div>
     );
 };

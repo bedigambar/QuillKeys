@@ -15,10 +15,13 @@ Why type mundane sentences when you can type wisdom that has shaped human though
 - **🎭 Literary Passages**: Type through authentic excerpts from masterworks of existential philosophy and timeless poetry
 - **📊 Real-time Analytics**: Track your WPM, accuracy, and progress as you type
 - **🧠 Smart Error Tracking**: Advanced logic that accurately tracks missed keys and skipped words for precise accuracy calculation
+- **⌨️ Keyboard Heatmap**: Visual keyboard showing which keys you struggle with most, color-coded by error frequency
 - **📈 History Tracking**: View your complete typing test history with detailed statistics, performance charts, and progress over time
 - **🅰️ Font Themes**: Choose from 6 beautiful font styles (Mono, Sans, Serif, Merriweather, Roboto, Fira) to match your preference
 - **✨ Caret Customization**: Select your preferred caret style (Block, Line, or Underline)
 - **🧘 Zen Mode**: Distraction-free typing experience with a minimalist interface
+- **🎯 Focus Mode**: Blur upcoming text to help you concentrate on the current words
+- **🔠 Caps Lock Warning**: Visual alert when Caps Lock is enabled during typing
 - **🌗 Dark/Light Mode**: Choose your ambiance—whether you prefer the depth of darkness or the clarity of light
 - **⏱️ Customised Test Lengths**: 15, 30, 60-second or customised typing sessions to match your pace
 - **📱 Fully Responsive**: Optimized for all screen sizes, with a tailored experience for mobile devices
