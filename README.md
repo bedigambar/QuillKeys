@@ -27,6 +27,18 @@ Why type mundane sentences when you can type wisdom that has shaped human though
 - **📱 Fully Responsive**: Optimized for all screen sizes, with a tailored experience for mobile devices
 - **🎨 Beautiful UI**: Clean, distraction-free interface built with modern design principles and smooth animations
 
+## 🎥 Demo Video
+
+Check out the application in action:
+
+
+
+https://github.com/user-attachments/assets/d4f59b2f-930a-4f81-b1f3-0f0ec794e5a8
+
+
+
+
+
 ## 🖤 Meet Your Literary Mentors
 
 <div align="center">
