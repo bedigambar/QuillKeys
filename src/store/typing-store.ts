@@ -105,7 +105,7 @@ export const useTypingStore = create<TypingState>()(
       fontTheme: 'roboto',
       caretStyle: 'line',
       zenMode: false,
-      smoothCaret: false,
+      smoothCaret: true,
       focusMode: false,
 
       setTimerDuration: (duration) => {

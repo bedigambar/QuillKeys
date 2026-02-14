@@ -3,17 +3,18 @@ import { motion } from 'framer-motion';
 import { useTypingStore } from '@/store/typing-store';
 import CapsLockWarning from './CapsLockWarning';
 
-const Caret = ({ style, className = '', smoothCaret }: { style: string, className?: string, smoothCaret: boolean }) => {
+const Caret = ({ style, className = '' }: { style: string, className?: string }) => {
     return (
         <motion.span
             layoutId="caret"
             layout
-            transition={smoothCaret ? { 
+            transition={{ 
                 type: "spring", 
-                stiffness: 800, 
-                damping: 50,
-                mass: 0.5
-            } : { duration: 0 }}
+                stiffness: 400, 
+                damping: 30,
+                mass: 0.8,
+                restDelta: 0.001
+            }}
             className={`absolute pointer-events-none z-10 ${
                 style === 'block' 
                     ? 'inset-0 bg-primary/40 caret-blink-block' 
@@ -27,7 +28,7 @@ const Caret = ({ style, className = '', smoothCaret }: { style: string, classNam
 
 const TypingArea = () => {
 
-    const { currentText, typedText, setTypedText, status, countdownTime, fontTheme, caretStyle, smoothCaret, focusMode } = useTypingStore();
+    const { currentText, typedText, setTypedText, status, countdownTime, fontTheme, caretStyle, focusMode } = useTypingStore();
     const inputRef = useRef<HTMLInputElement>(null);
     const [capsLockOn, setCapsLockOn] = useState(false);
 
@@ -119,7 +120,7 @@ const TypingArea = () => {
                                             return (
                                                 <span key={charIndex} className={className}>
                                                     {char}
-                                                    {showCaret && <Caret style={caretStyle} smoothCaret={smoothCaret} className={caretStyle === 'line' ? '-left-[1px]' : ''} />}
+                                                    {showCaret && <Caret style={caretStyle} className={caretStyle === 'line' ? '-left-[1px]' : ''} />}
                                                 </span>
                                             );
                                         })}
@@ -129,7 +130,7 @@ const TypingArea = () => {
                                             </span>
                                         )}
                                         {isCurrentWord && typedWord.length >= word.length && (
-                                            <Caret style={caretStyle} smoothCaret={smoothCaret} className={caretStyle === 'line' ? '-right-[1px]' : ''} />
+                                            <Caret style={caretStyle} className={caretStyle === 'line' ? '-right-[1px]' : ''} />
                                         )}
                                     </span>
                                 );
