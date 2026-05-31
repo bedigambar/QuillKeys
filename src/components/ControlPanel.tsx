@@ -119,10 +119,10 @@ const ControlPanel = () => {
                 </div>
 
                 <div className="flex flex-col gap-1.5 w-full">
-                    <div className="text-xs font-medium text-gray-700 dark:text-gray-300 ml-1 flex justify-between items-center w-full">
+                    <div className="text-xs font-medium text-gray-700 dark:text-gray-300 ml-1 flex justify-center items-center w-full relative">
                         <span>Category</span>
                         {adaptiveMode && currentMood && (
-                            <span className="text-[10px] text-purple-600 dark:text-purple-400 font-bold uppercase animate-pulse">
+                            <span className="absolute right-0 text-[10px] text-purple-600 dark:text-purple-400 font-bold uppercase animate-pulse">
                                 {currentMood}
                             </span>
                         )}
