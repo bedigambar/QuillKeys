@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTypingStore } from '@/store/typing-store';
 import CapsLockWarning from './CapsLockWarning';
+import TempoLabel from './TempoLabel';
 
 const Caret = ({ style, className = '' }: { style: string, className?: string }) => {
     return (
@@ -28,7 +29,7 @@ const Caret = ({ style, className = '' }: { style: string, className?: string })
 
 const TypingArea = () => {
 
-    const { currentText, typedText, setTypedText, status, countdownTime, fontTheme, caretStyle, focusMode } = useTypingStore();
+    const { currentText, typedText, setTypedText, status, countdownTime, fontTheme, caretStyle, focusMode, currentFontSizeScale } = useTypingStore();
     const inputRef = useRef<HTMLInputElement>(null);
     const [capsLockOn, setCapsLockOn] = useState(false);
 
@@ -149,13 +150,19 @@ const TypingArea = () => {
             className="relative"
         >
             <CapsLockWarning isVisible={capsLockOn && status === 'running'} />
+            <TempoLabel />
 
-            <div className={`p-3 sm:p-4 md:p-6 min-h-[150px] sm:min-h-[200px] ${fontTheme === 'serif' ? 'font-serif' :
+            <div 
+                className={`p-3 sm:p-4 md:p-6 min-h-[150px] sm:min-h-[200px] transition-all duration-300 ease-in-out ${fontTheme === 'serif' ? 'font-serif' :
                 fontTheme === 'mono' ? 'font-mono' :
                     fontTheme === 'merriweather' ? 'font-merriweather' :
                         fontTheme === 'roboto' ? 'font-roboto' :
                             fontTheme === 'fira' ? 'font-fira' : 'font-sans'
-                }`}>
+                }`}
+                style={{
+                    fontSize: `calc(1.125rem * ${currentFontSizeScale})`
+                }}
+            >
 
                 <div className='text-base sm:text-lg md:text-xl leading-relaxed'>
                     {renderText()}

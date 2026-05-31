@@ -389,8 +389,77 @@ export const questions: Question[] = [
     contentType: "poetry",
     category: "Poe",
     text: "Hear the sledges with the bells—\nSilver bells!\nWhat a world of merriment their melody foretells!\nHow they tinkle, tinkle, tinkle,\nIn the icy air of night!\nWhile the stars that oversprinkle\nAll the heavens, seem to twinkle\nWith a crystalline delight;"
+  },
+  {
+    id: "woolf-1",
+    contentType: "prose",
+    category: "Woolf",
+    text: "Mrs. Dalloway said she would buy the flowers herself. For Lucy had her work cut out for her. The doors would be taken off their hinges; Rumpelmayer’s men were coming. And then, thought Clarissa Dalloway, what a morning—fresh as if issued to children on a beach."
+  },
+  {
+    id: "woolf-2",
+    contentType: "prose",
+    category: "Woolf",
+    text: "What a lark! What a plunge! For so it had always seemed to her, when, with a little squeak of the hinges, which she could hear now, she had burst open the French windows and plunged at Bourton into the open air. How fresh, how calm, stiller than this, of course, the air was in the early morning; like the flap of a wave; the kiss of a wave; chill and sharp and yet solemn, feeling as she did, standing there at the open window, that something awful was about to happen;"
+  },
+  {
+    id: "woolf-3",
+    contentType: "prose",
+    category: "Woolf",
+    text: "But she need not have been afraid. They had not met for years. They had not spoken. Yet she knew that they were thinking of each other; she knew that when he walked in the park, when he looked at the flowers, when he heard the music, he was saying to himself: she is here, she is in this city, she is breathing this very air."
+  },
+  {
+    id: "woolf-4",
+    contentType: "prose",
+    category: "Woolf",
+    text: "The light blade of her mind shivered the tree of life, and the leaves came falling, gold and green, about her head. It was a beautiful sight, but she did not see it. She was looking at the white lighthouse, she was listening to the voice of the sea, she was thinking of the passage of time."
+  },
+  {
+    id: "woolf-5",
+    contentType: "prose",
+    category: "Woolf",
+    text: "For it was not characters only that she saw, but the relationships between characters, the way they moved together, the way they spoke, the way they were silent. She wanted to catch the very texture of life, the fleeting moments of beauty and pain, before they dissolved forever in the great river of time."
   }
 ];
+
+export interface TextProfile {
+  sentenceLengths: number[];
+  avgSentenceLength: number;
+  punctuationDensity: number;
+  wordComplexity: number;
+}
+
+export const analyzeTextProfile = (text: string): TextProfile => {
+  const sentences = text.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 0);
+  const sentenceLengths = sentences.map(s => s.split(/\s+/).filter(w => w.length > 0).length);
+  
+  const totalSentences = sentenceLengths.length;
+  const avgSentenceLength = totalSentences > 0 
+    ? sentenceLengths.reduce((sum, len) => sum + len, 0) / totalSentences 
+    : 0;
+
+  const words = text.split(/\s+/).filter(w => w.length > 0);
+  const wordCount = words.length;
+
+  const punctuationMarks = (text.match(/[,;:()\-'"’“”?!\.]/g) || []).length;
+  const punctuationDensity = wordCount > 0 ? (punctuationMarks / wordCount) * 100 : 0;
+
+  const totalWordChars = words.reduce((sum, w) => sum + w.replace(/[^a-zA-Z]/g, '').length, 0);
+  const wordComplexity = wordCount > 0 ? totalWordChars / wordCount : 0;
+
+  return {
+    sentenceLengths: sentenceLengths.length > 0 ? sentenceLengths : [0],
+    avgSentenceLength,
+    punctuationDensity,
+    wordComplexity
+  };
+};
+
+export const getAuthorProfile = (category: string): TextProfile => {
+  const categoryQuestions = getQuestionsByCategory(category);
+  const combinedText = categoryQuestions.map(q => q.text).join(' ');
+  return analyzeTextProfile(combinedText);
+};
 
 export const getQuestionsByContentType = (contentType: 'prose' | 'poetry'): Question[] => {
   return questions.filter(q => q.contentType === contentType);
@@ -417,3 +486,4 @@ export const getContentTypeByCategory = (category: string): 'prose' | 'poetry' =
   const question = questions.find(q => q.category === category);
   return question ? question.contentType : 'prose';
 };
+

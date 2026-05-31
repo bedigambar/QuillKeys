@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import KeyboardHeatmap from '@/components/KeyboardHeatmap';
+import StyleCard from '@/components/StyleCard';
+import AuthorFingerprint from '@/components/AuthorFingerprint';
 import { 
   Line, 
   XAxis, 
@@ -261,6 +263,17 @@ const Results = () => {
             </CardContent>
           </Card>
 
+          {/* Visual Signature Style Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45 }}
+            className="flex flex-col items-center justify-center p-6 border rounded-xl bg-card/40 backdrop-blur-md"
+          >
+            <h2 className="text-xl font-bold mb-4 text-center font-serif tracking-tight">Your Literary Signature Card</h2>
+            <StyleCard />
+          </motion.div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -330,6 +343,14 @@ const Results = () => {
             transition={{ delay: 0.65 }}
           >
             <KeyboardHeatmap keyErrors={keyErrors} />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+          >
+            <AuthorFingerprint currentCategory={category} />
           </motion.div>
 
           <motion.div

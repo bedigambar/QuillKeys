@@ -5,7 +5,7 @@ import { TabsList } from '@radix-ui/react-tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Button } from './ui/button';
 
-import { Play, RotateCcw, Clock, Type, MousePointer2, EyeOff, BookOpen, Focus } from 'lucide-react';
+import { Play, RotateCcw, Clock, Type, MousePointer2, EyeOff, BookOpen, Focus, Sparkles } from 'lucide-react';
 import { getRandomQuestion, getCategoriesByContentType } from '@/data/questions';
 import { useState, useEffect } from 'react';
 
@@ -13,7 +13,8 @@ const ControlPanel = () => {
     const { timerDuration, setTimerDuration, category, startCountdown, setCategory, status, resetTest,
         setCurrentText, customTimerDuration, setCustomTimerDuration,
         fontTheme, setFontTheme, caretStyle, setCaretStyle, zenMode, toggleZenMode,
-        contentType, setContentType, focusMode, toggleFocusMode
+        contentType, setContentType, focusMode, toggleFocusMode,
+        adaptiveMode, toggleAdaptiveMode, currentMood
     } = useTypingStore();
 
     const [customInput, setCustomInput] = useState(customTimerDuration.toString());
@@ -95,117 +96,140 @@ const ControlPanel = () => {
                 )}
             </div>
 
-            <div className='flex flex-col lg:flex-row items-center lg:items-end justify-center gap-4 lg:gap-4 pt-4'>
-                <div className='grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-4 lg:gap-4 w-full lg:w-auto'>
-                    <div className='flex flex-col gap-1.5 w-full sm:w-auto'>
-                        <div className='text-xs font-medium text-gray-700 dark:text-gray-300 ml-1'>Type</div>
-                        <Select
-                            value={contentType}
-                            onValueChange={(val: 'prose' | 'poetry') => setContentType(val)}
-                            disabled={status === 'running' || status === 'countdown'}
-                        >
-                            <SelectTrigger className="w-full sm:w-[120px]">
-                                <div className="flex items-center gap-2">
-                                    <BookOpen className="w-4 h-4" />
-                                    <SelectValue />
-                                </div>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="prose">Prose</SelectItem>
-                                <SelectItem value="poetry">Poetry</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className='flex flex-col gap-1.5 w-full sm:w-auto'>
-                        <div className='text-xs font-medium text-gray-700 dark:text-gray-300 ml-1'>Category</div>
-                        <Select
-                            value={category}
-                            onValueChange={setCategory}
-                            disabled={status === 'running' || status === 'countdown'}
-                        >
-                            <SelectTrigger className="w-full sm:w-[160px]">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full max-w-3xl mx-auto pt-4">
+                {/* Row 1: Select inputs */}
+                <div className="flex flex-col gap-1.5 w-full">
+                    <div className="text-xs font-medium text-gray-700 dark:text-gray-300 ml-1">Type</div>
+                    <Select
+                        value={contentType}
+                        onValueChange={(val: 'prose' | 'poetry') => setContentType(val)}
+                        disabled={status === 'running' || status === 'countdown'}
+                    >
+                        <SelectTrigger className="w-full">
+                            <div className="flex items-center gap-2">
+                                <BookOpen className="w-4 h-4" />
                                 <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {categories.map((cat) => (
-                                    <SelectItem key={cat} value={cat}>
-                                        {cat}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className='flex flex-col gap-1.5 w-full sm:w-auto'>
-                        <div className='text-xs font-medium text-gray-700 dark:text-gray-300 ml-1'>Font</div>
-                        <Select value={fontTheme} onValueChange={(v) => setFontTheme(v as any)}>
-                            <SelectTrigger className="w-full sm:w-[160px]">
-                                <div className="flex items-center gap-2 truncate">
-                                    <Type className="w-4 h-4 shrink-0" />
-                                    <SelectValue placeholder="Font" />
-                                </div>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="serif">Serif</SelectItem>
-                                <SelectItem value="sans">Sans</SelectItem>
-                                <SelectItem value="mono">Mono</SelectItem>
-                                <SelectItem value="merriweather">Merriweather</SelectItem>
-                                <SelectItem value="roboto">Roboto Mono</SelectItem>
-                                <SelectItem value="fira">Fira Code</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className='flex flex-col gap-1.5 w-full sm:w-auto'>
-                        <div className='text-xs font-medium text-gray-700 dark:text-gray-300 ml-1'>Caret</div>
-                        <Select value={caretStyle} onValueChange={(v) => setCaretStyle(v as any)}>
-                            <SelectTrigger className="w-full sm:w-[130px]">
-                                <div className="flex items-center gap-2 overflow-hidden">
-                                    <MousePointer2 className="w-4 h-4 shrink-0" />
-                                    <SelectValue placeholder="Caret" />
-                                </div>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="line">Line</SelectItem>
-                                <SelectItem value="block">Block</SelectItem>
-                                <SelectItem value="underline">Underline</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="prose">Prose</SelectItem>
+                            <SelectItem value="poetry">Poetry</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
 
-                <div className='flex gap-2 sm:gap-3 items-end justify-center pb-0.5 w-full lg:w-auto'>
+                <div className="flex flex-col gap-1.5 w-full">
+                    <div className="text-xs font-medium text-gray-700 dark:text-gray-300 ml-1 flex justify-between items-center w-full">
+                        <span>Category</span>
+                        {adaptiveMode && currentMood && (
+                            <span className="text-[10px] text-purple-600 dark:text-purple-400 font-bold uppercase animate-pulse">
+                                {currentMood}
+                            </span>
+                        )}
+                    </div>
+                    <Select
+                        value={category}
+                        onValueChange={setCategory}
+                        disabled={status === 'running' || status === 'countdown'}
+                    >
+                        <SelectTrigger className="w-full">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {categories.map((cat) => (
+                                <SelectItem key={cat} value={cat}>
+                                    {cat}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="flex flex-col gap-1.5 w-full">
+                    <div className="text-xs font-medium text-gray-700 dark:text-gray-300 ml-1">Font</div>
+                    <Select value={fontTheme} onValueChange={(v) => setFontTheme(v as any)}>
+                        <SelectTrigger className="w-full">
+                            <div className="flex items-center gap-2 truncate">
+                                <Type className="w-4 h-4 shrink-0" />
+                                <SelectValue placeholder="Font" />
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="serif">Serif</SelectItem>
+                            <SelectItem value="sans">Sans</SelectItem>
+                            <SelectItem value="mono">Mono</SelectItem>
+                            <SelectItem value="merriweather">Merriweather</SelectItem>
+                            <SelectItem value="roboto">Roboto Mono</SelectItem>
+                            <SelectItem value="fira">Fira Code</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="flex flex-col gap-1.5 w-full">
+                    <div className="text-xs font-medium text-gray-700 dark:text-gray-300 ml-1">Caret</div>
+                    <Select value={caretStyle} onValueChange={(v) => setCaretStyle(v as any)}>
+                        <SelectTrigger className="w-full">
+                            <div className="flex items-center gap-2 overflow-hidden">
+                                <MousePointer2 className="w-4 h-4 shrink-0" />
+                                <SelectValue placeholder="Caret" />
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="line">Line</SelectItem>
+                            <SelectItem value="block">Block</SelectItem>
+                            <SelectItem value="underline">Underline</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Row 2: Action Buttons */}
+                <div className="flex flex-col gap-1.5 w-full justify-end">
                     <Button
-                        variant={zenMode ? "secondary" : "ghost"}
+                        variant={zenMode ? "secondary" : "outline"}
                         onClick={toggleZenMode}
-                        className="h-10 w-10 p-0"
+                        className="h-10 w-full flex items-center justify-center gap-2"
                         title="Zen Mode"
                     >
                         <EyeOff className="w-4 h-4" />
+                        <span className="text-xs font-medium">Zen Mode</span>
                     </Button>
+                </div>
 
+                <div className="flex flex-col gap-1.5 w-full justify-end">
                     <Button
-                        variant={focusMode ? "secondary" : "ghost"}
+                        variant={focusMode ? "secondary" : "outline"}
                         onClick={toggleFocusMode}
-                        className="h-10 w-10 p-0"
+                        className="h-10 w-full flex items-center justify-center gap-2"
                         title="Focus Mode - Blur upcoming text"
                     >
                         <Focus className="w-4 h-4" />
+                        <span className="text-xs font-medium">Focus Mode</span>
                     </Button>
+                </div>
 
-                    {status == 'idle' && (
-                        <Button onClick={handleStart} className='h-10 px-4 sm:px-6'>
-                            <Play className='w-4 h-4 mr-1 sm:mr-2' />
-                            <span className="hidden sm:inline">Start Test</span>
-                            <span className="sm:hidden">Start</span>
+                <div className="flex flex-col gap-1.5 w-full justify-end">
+                    <Button
+                        variant={adaptiveMode ? "secondary" : "outline"}
+                        onClick={toggleAdaptiveMode}
+                        className="h-10 w-full flex items-center justify-center gap-2"
+                        title="Adaptive Mode - Passages adapt to your rhythm"
+                        disabled={status === 'running' || status === 'countdown'}
+                    >
+                        <Sparkles className={`w-4 h-4 ${adaptiveMode ? 'text-yellow-500 fill-yellow-500/20 animate-pulse' : 'text-zinc-500'}`} />
+                        <span className="text-xs font-medium">Adaptive Mode</span>
+                    </Button>
+                </div>
+
+                <div className="flex flex-col gap-1.5 w-full justify-end">
+                    {status === 'idle' ? (
+                        <Button onClick={handleStart} className="h-10 w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
+                            <Play className="w-4 h-4" />
+                            <span className="text-xs font-semibold">Start Test</span>
                         </Button>
-                    )}
-
-                    {(status == 'running' || status == 'completed' || status == 'countdown') && (
-                        <Button onClick={resetTest} variant="outline" className="h-10 px-4 sm:px-6">
-                            <RotateCcw className="h-4 w-4 mr-1 sm:mr-2" />
-                            Reset
+                    ) : (
+                        <Button onClick={resetTest} variant="destructive" className="h-10 w-full flex items-center justify-center gap-2">
+                            <RotateCcw className="h-4 w-4 animate-spin-slow" />
+                            <span className="text-xs font-semibold">Reset</span>
                         </Button>
                     )}
                 </div>

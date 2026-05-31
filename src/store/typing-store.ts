@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { getRandomQuestion } from '@/data/questions';
+import { getRandomQuestion, analyzeTextProfile } from '@/data/questions';
 
 export type TestStatus = 'idle' | 'countdown' | 'running' | 'completed';
 export type TimerOption = 30 | 60 | 180 | 'custom';
@@ -15,7 +15,35 @@ export interface TestResult {
   category: string;
   contentType: ContentType;
   timestamp: number;
+  sentenceLengths?: number[];
+  punctuationDensity?: number;
+  wordComplexity?: number;
 }
+
+const getAdaptiveCategoryForMood = (
+  mood: 'tense' | 'flowing' | 'heavy' | 'lyrical' | null,
+  contentType: ContentType,
+  currentCategory: string
+): string => {
+  if (!mood) return currentCategory;
+  if (contentType === 'prose') {
+    switch (mood) {
+      case 'tense': return 'Camus';
+      case 'flowing': return 'Woolf';
+      case 'heavy': return 'Kafka';
+      case 'lyrical': return 'Gogol';
+      default: return currentCategory;
+    }
+  } else {
+    switch (mood) {
+      case 'tense': return 'Poe';
+      case 'flowing': return 'Whitman';
+      case 'heavy': return 'Frost';
+      case 'lyrical': return 'Dickinson';
+      default: return currentCategory;
+    }
+  }
+};
 
 export interface WpmDataPoint {
   time: number;
@@ -55,6 +83,14 @@ interface TypingState {
   smoothCaret: boolean;
   focusMode: boolean;
 
+  // Mood and Rhythm Adaptive state
+  adaptiveMode: boolean;
+  currentMood: 'tense' | 'flowing' | 'heavy' | 'lyrical' | null;
+  typingTempo: 'adagio' | 'andante' | 'allegro' | 'presto';
+  currentFontSizeScale: number;
+  keystrokeIntervals: number[];
+  lastKeystrokeTime: number | null;
+
   setTimerDuration: (duration: TimerOption) => void;
   setCustomTimerDuration: (duration: number) => void;
   setContentType: (type: ContentType) => void;
@@ -76,6 +112,7 @@ interface TypingState {
   toggleZenMode: () => void;
   toggleSmoothCaret: () => void;
   toggleFocusMode: () => void;
+  toggleAdaptiveMode: () => void;
 
   clearHistory: () => void;
 }
@@ -107,6 +144,14 @@ export const useTypingStore = create<TypingState>()(
       zenMode: false,
       smoothCaret: true,
       focusMode: false,
+
+      // Initial Mood & Adaptive rhythm state
+      adaptiveMode: true,
+      currentMood: null,
+      typingTempo: 'andante',
+      currentFontSizeScale: 1.0,
+      keystrokeIntervals: [],
+      lastKeystrokeTime: null,
 
       setTimerDuration: (duration) => {
         const { customTimerDuration } = get();
@@ -202,12 +247,73 @@ export const useTypingStore = create<TypingState>()(
           }
         }
 
+        // --- Calculate Keystroke Rhythm/Tempo & Dynamic Text Scale ---
+        const now = Date.now();
+        let newIntervals = [...get().keystrokeIntervals];
+        let lastTime = get().lastKeystrokeTime;
+
+        if (text.length > oldText.length && status === 'running') {
+          if (lastTime !== null) {
+            const diff = now - lastTime;
+            if (diff < 2000) {
+              newIntervals.push(diff);
+              if (newIntervals.length > 20) {
+                newIntervals = newIntervals.slice(-20);
+              }
+            }
+          }
+          lastTime = now;
+        }
+
+        let typingTempo: 'adagio' | 'andante' | 'allegro' | 'presto' = 'andante';
+        let currentFontSizeScale = 1.0;
+        let currentMood = get().currentMood;
+
+        if (newIntervals.length >= 5) {
+          const sum = newIntervals.reduce((a, b) => a + b, 0);
+          const avgInterval = sum / newIntervals.length;
+          const instantWpm = 12000 / avgInterval;
+
+          if (instantWpm < 35) {
+            typingTempo = 'adagio';
+          } else if (instantWpm < 60) {
+            typingTempo = 'andante';
+          } else if (instantWpm < 85) {
+            typingTempo = 'allegro';
+          } else {
+            typingTempo = 'presto';
+          }
+
+          // Dynamic scale: slow renders text larger, frantic makes it smaller
+          currentFontSizeScale = Math.max(0.75, Math.min(1.35, 1.35 - (instantWpm / 150)));
+
+          // Rhythm variance (CV) for mood classification
+          const variance = newIntervals.reduce((a, b) => a + Math.pow(b - avgInterval, 2), 0) / newIntervals.length;
+          const stdDev = Math.sqrt(variance);
+          const cv = stdDev / avgInterval;
+
+          if (cv > 0.35) {
+            currentMood = 'tense';
+          } else if (instantWpm > 55 && cv < 0.20) {
+            currentMood = 'flowing';
+          } else if (instantWpm <= 40 && cv < 0.25) {
+            currentMood = 'heavy';
+          } else {
+            currentMood = 'lyrical';
+          }
+        }
+
         set({
           typedText: text,
           grossTypedChars: grossTypedChars + newKeystrokes,
           correctChars: oldCorrectChars + newCorrectChars,
           incorrectChars: oldIncorrectChars + newIncorrectChars,
-          keyErrors: newKeyErrors
+          keyErrors: newKeyErrors,
+          keystrokeIntervals: newIntervals,
+          lastKeystrokeTime: lastTime,
+          typingTempo,
+          currentFontSizeScale,
+          currentMood
         });
 
         get().calculateStats();
@@ -227,7 +333,12 @@ export const useTypingStore = create<TypingState>()(
           correctChars: 0,
           incorrectChars: 0,
           keyErrors: {},
-          rawWpm: 0
+          rawWpm: 0,
+          currentMood: null,
+          typingTempo: 'andante',
+          currentFontSizeScale: 1.0,
+          keystrokeIntervals: [],
+          lastKeystrokeTime: Date.now()
         });
       },
 
@@ -245,7 +356,8 @@ export const useTypingStore = create<TypingState>()(
         const actualDuration = timerDuration === 'custom' ? customTimerDuration : timerDuration;
         set({
           status: 'running',
-          timeLeft: actualDuration
+          timeLeft: actualDuration,
+          lastKeystrokeTime: Date.now()
         });
       },
 
@@ -262,9 +374,12 @@ export const useTypingStore = create<TypingState>()(
       },
 
       completeTest: () => {
-        const { wpm, accuracy, timerDuration, customTimerDuration, category, contentType, testResults } = get();
+        const { wpm, accuracy, timerDuration, customTimerDuration, category, contentType, testResults, typedText } = get();
         const actualDuration = timerDuration === 'custom' ? customTimerDuration : timerDuration;
         const timeTaken = actualDuration - get().timeLeft;
+
+        // Perform style fingerprint analysis of user's typed input
+        const profile = analyzeTextProfile(typedText);
 
         const newResult: TestResult = {
           wpm: wpm,
@@ -272,7 +387,10 @@ export const useTypingStore = create<TypingState>()(
           timeTaken,
           category,
           contentType,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          sentenceLengths: profile.sentenceLengths,
+          punctuationDensity: profile.punctuationDensity,
+          wordComplexity: profile.wordComplexity
         };
 
         set({
@@ -295,7 +413,12 @@ export const useTypingStore = create<TypingState>()(
           correctChars: 0,
           incorrectChars: 0,
           keyErrors: {},
-          rawWpm: 0
+          rawWpm: 0,
+          currentMood: null,
+          typingTempo: 'andante',
+          currentFontSizeScale: 1.0,
+          keystrokeIntervals: [],
+          lastKeystrokeTime: null
         });
       },
 
@@ -346,9 +469,14 @@ export const useTypingStore = create<TypingState>()(
       },
 
       loadNewQuestion: () => {
-        const { category, status } = get();
+        const { category, status, adaptiveMode, currentMood, contentType } = get();
         if (status === 'running') {
-          const newQuestion = getRandomQuestion(category);
+          let nextCategory = category;
+          if (adaptiveMode && currentMood) {
+            nextCategory = getAdaptiveCategoryForMood(currentMood, contentType, category);
+            set({ category: nextCategory });
+          }
+          const newQuestion = getRandomQuestion(nextCategory);
           set({
             currentText: newQuestion.text,
             typedText: ''
@@ -361,6 +489,7 @@ export const useTypingStore = create<TypingState>()(
       toggleZenMode: () => set((state) => ({ zenMode: !state.zenMode })),
       toggleSmoothCaret: () => set((state) => ({ smoothCaret: !state.smoothCaret })),
       toggleFocusMode: () => set((state) => ({ focusMode: !state.focusMode })),
+      toggleAdaptiveMode: () => set((state) => ({ adaptiveMode: !state.adaptiveMode })),
 
       clearHistory: () => {
         set({ testResults: [] });
@@ -377,7 +506,8 @@ export const useTypingStore = create<TypingState>()(
         fontTheme: state.fontTheme,
         caretStyle: state.caretStyle,
         smoothCaret: state.smoothCaret,
-        focusMode: state.focusMode
+        focusMode: state.focusMode,
+        adaptiveMode: state.adaptiveMode
       })
     }
   )
