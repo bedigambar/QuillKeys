@@ -3,7 +3,6 @@
     <img src="./public/icon.webp" alt="QuillKeys Logo" width="240" style="border-radius: 24px; margin-bottom: 20px;" />
   </a>
 
-# 🖋️ QuillKeys
 
 > *"You do not need to leave your room. Remain sitting at your table and listen. The world will freely offer itself to you to be unmasked."* — Franz Kafka
 
