@@ -19,20 +19,20 @@ Why type mundane sentences when you can type wisdom that has shaped human though
 
 ## ✨ Features
 
-- **🎭 Literary Passages**: Type through authentic excerpts from masterworks of existential philosophy and timeless poetry
-- **📊 Real-time Analytics**: Track your WPM, accuracy, and progress as you type
-- **🧠 Smart Error Tracking**: Advanced logic that accurately tracks missed keys and skipped words for precise accuracy calculation
-- **⌨️ Keyboard Heatmap**: Visual keyboard showing which keys you struggle with most, color-coded by error frequency
-- **📈 History Tracking**: View your complete typing test history with detailed statistics, performance charts, and progress over time
-- **🅰️ Font Themes**: Choose from 6 beautiful font styles (Mono, Sans, Serif, Merriweather, Roboto, Fira) to match your preference
-- **✨ Caret Customization**: Select your preferred caret style (Block, Line, or Underline)
-- **🧘 Zen Mode**: Distraction-free typing experience with a minimalist interface
-- **🎯 Focus Mode**: Blur upcoming text to help you concentrate on the current words
-- **⏱️ Customised Test Lengths**: 15, 30, 60-second or customised typing sessions to match your pace.
-- **🌊 Mood-Adaptive Selection**: Dynamically analyzes your typing rhythm (standard deviation of inter-keystroke intervals + accuracy) to classify your state and select the next passage (e.g., tense/erratic = Camus, flowing/steady = Woolf, deliberate = Kafka).
-- **🖋️ Author Style Fingerprint**: Side-by-side comparative analysis of your typing patterns against an author's actual style profile (measuring sentence length distribution, punctuation density per 100 words, and vocabulary complexity). Unlock this visual fingerprint by completing 5 passages from any author.
-- **📐 Kinetic Text Mirror**: Typographic layout that grows larger (up to 1.35x) when typing slowly and deliberately (Adagio/Andante) and shrinks smaller (down to 0.75x) when typing fast or frantically (Allegro/Presto).
-- **📸 shareable Signature Card**: Export a premium, high-contrast solid black and gold visual certificate of your typing run containing an SVG graph of your speed fluctuations, key metrics, and a pulled excerpt from the text.
+- **Literary Passages**: Type through authentic excerpts from masterworks of existential philosophy and timeless poetry
+- **Real-time Analytics**: Track your WPM, accuracy, and progress as you type
+- **Smart Error Tracking**: Advanced logic that accurately tracks missed keys and skipped words for precise accuracy calculation
+- **Keyboard Heatmap**: Visual keyboard showing which keys you struggle with most, color-coded by error frequency
+- **History Tracking**: View your complete typing test history with detailed statistics, performance charts, and progress over time
+- **Font Themes**: Choose from 6 beautiful font styles (Mono, Sans, Serif, Merriweather, Roboto, Fira) to match your preference
+- **Caret Customization**: Select your preferred caret style (Block, Line, or Underline)
+- **Zen Mode**: Distraction-free typing experience with a minimalist interface
+- **Focus Mode**: Blur upcoming text to help you concentrate on the current words
+- **Customised Test Lengths**: 15, 30, 60-second or customised typing sessions to match your pace.
+- **Mood-Adaptive Selection**: Dynamically analyzes your typing rhythm (standard deviation of inter-keystroke intervals + accuracy) to classify your state and select the next passage (e.g., tense/erratic = Camus, flowing/steady = Woolf, deliberate = Kafka).
+- **Author Style Fingerprint**: Side-by-side comparative analysis of your typing patterns against an author's actual style profile (measuring sentence length distribution, punctuation density per 100 words, and vocabulary complexity). Unlock this visual fingerprint by completing 5 passages from any author.
+- **Kinetic Text Mirror**: Typographic layout that grows larger (up to 1.35x) when typing slowly and deliberately (Adagio/Andante) and shrinks smaller (down to 0.75x) when typing fast or frantically (Allegro/Presto).
+- **Shareable Signature Card**: Export a premium, high-contrast solid black and gold visual certificate of your typing run containing an SVG graph of your speed fluctuations, key metrics, and a pulled excerpt from the text.
 ## 🎥 Demo Video
 
 Check out the application in action:
